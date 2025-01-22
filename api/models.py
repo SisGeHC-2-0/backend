@@ -106,7 +106,7 @@ class Attendance(models.Model):
     eventId = models.ForeignKey('Event', on_delete=models.CASCADE)
 
 class Certificate(models.Model):
-    path = models.CharField(max_length=511)
+    file = models.FileField(upload_to =os.sep.join(['certificate', '']))
     studentId = models.ForeignKey('Student', on_delete=models.CASCADE)
     eventId = models.ForeignKey('Event', on_delete=models.CASCADE, null=True)
     
