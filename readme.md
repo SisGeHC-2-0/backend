@@ -53,6 +53,13 @@ With the db running it is necessary to also apply the migrations with the comman
     # please fell free to correct this segment.
 ```
 
+If you also want to populate the db with some dummy data, you can just run the populate_db.py script
+
+
+```
+    python populate_db.py
+```
+
 Eventually a setup script is going to be made.
 
 # Running the application
