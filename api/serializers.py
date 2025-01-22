@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 
-from .models import Major, HourType
+from .models import Major, ActivityType
 
 class MajorSerializer(serializers.ModelSerializer):
     class Meta:
@@ -9,7 +9,7 @@ class MajorSerializer(serializers.ModelSerializer):
         fields = ["id", "name"]
 
 
-class HourTypeSerializer(serializers.ModelSerializer):
+class ActivityTypeSerializer(serializers.ModelSerializer):
     class Meta:
-        model = HourType
+        model = ActivityType
         fields = ["id", "name", "total_max", "per_submission_max"]
