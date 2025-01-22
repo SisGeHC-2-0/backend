@@ -1,4 +1,4 @@
-import psycopg2
+import psycopg2, git
 
 connection = psycopg2.connect(database="postgres", user="postgres", password="example", host="127.0.0.1", port=5432)
 
@@ -72,3 +72,13 @@ cursor.execute("SELECT * FROM api_student")
 
 print(cursor.fetchall())
 print("\nif it just shown alicia and luiza it means it worked")
+
+
+print("Downloading files")
+
+
+from git import Repo  # pip install gitpython
+try:
+	Repo.clone_from("git@github.com:SisGeHC-2-0/backend.git", "./files",     branch='dummy_files')
+except Exception as e:
+	print("Couldn't download the files automatically. \nPlease refer to the branch 'dummy_files' and put both the images and certificates foldes in a new 'files' folder at the root of the project")
