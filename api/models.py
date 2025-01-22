@@ -1,5 +1,4 @@
 from django.db import models
-import os
 
 # Create your models here.
 
@@ -10,120 +9,92 @@ class Major(models.Model):
     def __str__(self):
         return f"Major: {self.name}"
     
-class ActivityType(models.Model):
+class HourType(models.Model):
     name = models.CharField(max_length=100, null=False)
     total_max = models.IntegerField(null=False)
     per_submission_max = models.IntegerField(null=False)
 
     def __str__(self):
-        return f"ActivityType: {self.name}"
-    
-class Principal(models.Model):
-    email = models.EmailField(unique=True)
-    
-    
-    ## validate the representation of this fields as char
-    enrollment_number = models.CharField(max_length=255, unique=True)
-
-    name = models.CharField(max_length=255)
-    password = models.CharField(max_length=255)
-    majorId = models.ForeignKey('Major', on_delete=models.CASCADE)
-    picture = models.ImageField(upload_to= os.sep.join(['images','principal', '']), null=True, blank=True, default=None)
-    def __str__(self):
-        return f"Principal {self.name}"
+        return f"HourType: {self.name}"
     
 
-class Professor(models.Model):
-    email = models.EmailField(unique=True)
-
-    ## validate the representation of this fields as char
-    enrollment_number = models.CharField(max_length=255, unique=True)
-
-    status= models.BooleanField(default=None, null=True)
-
-    name = models.CharField(max_length=255)
-    password = models.CharField(max_length=255)
-    majorId = models.ForeignKey('Major', on_delete=models.CASCADE)
-    picture = models.ImageField(upload_to=os.sep.join(['images','professor', '']), null=True, blank=True, default=None)
-
-
-    def __str__(self):
-        return f'Professor {self.name}'
-
+"""
 
 class Student(models.Model):
     name = models.CharField(max_length=255)  # Nome com limite de 255 caracteres
     password = models.CharField(max_length=255)  # Senha com limite de 255 caracteres
     email = models.EmailField(unique=True)  # Email único
-
-    ## validate the representation of this fields as char
-    enrollment_number = models.CharField(max_length=255, unique=True)
-
-
-    majorId = models.ForeignKey('Major', on_delete=models.CASCADE)  # Chave estrangeira para Curso
-    picture = models.ImageField(upload_to=os.sep.join(['images','professor', '']), null=True, blank=True, default=None)
+    majorId = models.ForeignKey('Curso', on_delete=models.CASCADE)  # Chave estrangeira para Curso
+    picture = models.ImageField(upload_to='perfil_aluno/', null=True, blank=True, default=None)
 
     def __str__(self):
-        return f"Student {self.name}"
+        return self.nome
 
 
-class Event(models.Model):
+class Evento(models.Model):
     name = models.CharField(max_length= 255)
     desc_short = models.CharField(max_length= 255)
     desc_detailed = models.CharField(max_length= 511)
-    enroll_date_begin = models.DateField()
-    enroll_date_end = models.DateField()
+    date_begin = models.DateField()
+    data_end = models.DateField()
     professorId = models.ForeignKey('Professor', on_delete=models.CASCADE)
-    ActivityTypeId = models.ForeignKey("ActivityType", on_delete=models.CASCADE)
-    picture = models.ImageField(upload_to=os.sep.join(['images','event', '']), null=True, blank=True, default=None)
-
-    workload = models.IntegerField(null= False)
-
-    minimum_attendances = models.IntegerField(null= False)
-    maximum_enrollments = models.IntegerField(null= False)
-
-    address = models.CharField(max_length=255, null=False)
-    is_online = models.BooleanField(default=False)
-    ended = models.BooleanField(default=False, null= False) 
+    hourTypeId = models.ForeignKey("HourType", on_delete=models.CASCADE)
+    picture = models.ImageField(upload_to='fotos/', null=True, blank=True, default=None)
+    horaInicio = models.TimeField(default=None)
+    horaFim = models.TimeField(default=None)
     def __str__(self):
             return self.nome
 
-class EventEnrollment(models.Model):
-    studentId = models.ForeignKey('Student', on_delete=models.CASCADE)
-    eventId = models.ForeignKey('Event', on_delete=models.CASCADE)
 
-class EventDate(models.Model):
-    date = models.DateField()
-    time_begin = models.TimeField()
-    time_end = models.TimeField()
-    eventId = models.ForeignKey('Event', on_delete=models.CASCADE)
+class Professor(models.Model):
+    email = models.EmailField(unique=True)
+    name = models.CharField(max_length=255)
+    password = models.CharField(max_length=255)
+    majorId = models.ForeignKey('major', on_delete=models.CASCADE)
+    picture = models.ImageField(upload_to='perfil_professor/', null=True, blank=True, default=None)
 
 
-class Attendance(models.Model):
-    date = models.DateField()
-    status = models.BooleanField(default=None, null=True)
-    enrollmentId = models.ForeignKey('EventEnrollment', on_delete=models.CASCADE)
-    eventId = models.ForeignKey('Event', on_delete=models.CASCADE)
+    def __str__(self):
+        return self.nome
+
+
+class TipoDeHora(models.Model):
+    nome_hora = models.CharField(max_length=255)
+    horas_max = models.IntegerField()
+    horas_max_atv = models.IntegerField()
+
+class HoraComplementar(models.Model):
+    horas = models.IntegerField()
+    tipoId = models.ForeignKey('TipoDeHora', on_delete=models.CASCADE)
+    alunoId = models.ForeignKey('Aluno', on_delete=models.CASCADE)
+    certificadoId = models.ForeignKey('Certificado', on_delete=models.CASCADE)
 
 class Certificate(models.Model):
-    path = models.CharField(max_length=511)
+    fs_path = models.CharField(max_length=511)
     studentId = models.ForeignKey('Student', on_delete=models.CASCADE)
-    eventId = models.ForeignKey('Event', on_delete=models.CASCADE, null=True)
+    eventId = models.ForeignKey('Event', on_delete=models.CASCADE)
+
+class Registration(models.Model):
+    studentId = models.ForeignKey('Student', on_delete=models.CASCADE)
+    eventId = models.ForeignKey('Event', on_delete=models.CASCADE)
+    #Validar com o pessoal
+    qr_code = models.ImageField(upload_to='qr_code/', null=True, blank=True, default=None)
+
+
+class Presenca(models.Model):
+    date = models.DateField()
+    status = models.BooleanField(default=None, null=True)
+    registrationId = models.ForeignKey('Registration', on_delete=models.CASCADE)
+    eventId = models.ForeignKey('Event', on_delete=models.CASCADE)
+
+class principal(models.Model):
+    email = models.EmailField(unique=True)
+    name = models.CharField(max_length=255)
+    password = models.CharField(max_length=255)
+    majorId = models.ForeignKey('Major', on_delete=models.CASCADE)
+    picture = models.ImageField(upload_to='perfil_coordenador/', null=True, blank=True, default=None)
+    def __str__(self):
+        return f"Principal {self.name}"
+
+"""
     
-    # Null is true in case it isnt a certificate that we generate
-    emission_date = models.DateTimeField(null=True)
-
-    # Some other attributes were described at the concrete model,
-    # But it looks like they come from confusion of the Certificate
-    # and the ComplementaryActivity tables
-
-class ComplementaryActivity(models.Model):
-    workload = models.IntegerField()
-    status = models.BooleanField(null=True, default=None)
-    description = models.CharField(max_length=500)
-    feedback = models.TextField(max_length=500)
-    ActivityTypeId = models.ForeignKey('ActivityType', on_delete=models.CASCADE)
-    tudentId = models.ForeignKey('Student', on_delete=models.CASCADE)
-    certificateId = models.ForeignKey('Certificate', on_delete=models.CASCADE)
-
-
