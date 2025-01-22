@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework import generics
-from .models import Major, HourType
-from .serializers import MajorSerializer, HourTypeSerializer
+from .models import Major, ActivityType
+from .serializers import MajorSerializer, ActivityTypeSerializer
 
 
 # Create your views here.
@@ -13,16 +13,16 @@ class MajorListCreate(generics.ListCreateAPIView):
 
 class MajorRetreiveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     queryset = Major.objects.all()
-    serializer_class = HourTypeSerializer
+    serializer_class = MajorSerializer
     lookup_field = "pk"
 
 
-class HourTypeListCreate(generics.ListCreateAPIView):
-    queryset = HourType.objects.all()
-    serializer_class = MajorSerializer
+class ActivityTypeListCreate(generics.ListCreateAPIView):
+    queryset = ActivityType.objects.all()
+    serializer_class = ActivityTypeSerializer
 
-class HourTypeRetreiveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
-    queryset = HourType.objects.all()
-    serializer_class = HourTypeSerializer
+class ActivityTypeRetreiveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
+    queryset = ActivityType.objects.all()
+    serializer_class = ActivityTypeSerializer
     lookup_field = "pk"
 

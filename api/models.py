@@ -10,13 +10,13 @@ class Major(models.Model):
     def __str__(self):
         return f"Major: {self.name}"
     
-class HourType(models.Model):
+class ActivityType(models.Model):
     name = models.CharField(max_length=100, null=False)
     total_max = models.IntegerField(null=False)
     per_submission_max = models.IntegerField(null=False)
 
     def __str__(self):
-        return f"HourType: {self.name}"
+        return f"ActivityType: {self.name}"
     
 class Principal(models.Model):
     email = models.EmailField(unique=True)
@@ -67,14 +67,14 @@ class Student(models.Model):
         return f"Student {self.name}"
 
 
-class Evento(models.Model):
+class Event(models.Model):
     name = models.CharField(max_length= 255)
     desc_short = models.CharField(max_length= 255)
     desc_detailed = models.CharField(max_length= 511)
     enroll_date_begin = models.DateField()
     enroll_date_end = models.DateField()
     professorId = models.ForeignKey('Professor', on_delete=models.CASCADE)
-    hourTypeId = models.ForeignKey("HourType", on_delete=models.CASCADE)
+    ActivityTypeId = models.ForeignKey("ActivityType", on_delete=models.CASCADE)
     picture = models.ImageField(upload_to=os.sep.join(['images','event', '']), null=True, blank=True, default=None)
 
     workload = models.IntegerField(null= False)
@@ -115,14 +115,14 @@ class Certificate(models.Model):
 
     # Some other attributes were described at the concrete model,
     # But it looks like they come from confusion of the Certificate
-    # and the HourSubmission tables
+    # and the ComplementaryActivity tables
 
-class HourSubmission(models.Model):
+class ComplementaryActivity(models.Model):
     workload = models.IntegerField()
     status = models.BooleanField(null=True, default=None)
     description = models.CharField(max_length=500)
     feedback = models.TextField(max_length=500)
-    hourTypeId = models.ForeignKey('HourType', on_delete=models.CASCADE)
+    ActivityTypeId = models.ForeignKey('ActivityType', on_delete=models.CASCADE)
     tudentId = models.ForeignKey('Student', on_delete=models.CASCADE)
     certificateId = models.ForeignKey('Certificate', on_delete=models.CASCADE)
 
