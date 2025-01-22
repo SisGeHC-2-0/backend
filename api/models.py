@@ -100,10 +100,9 @@ class EventDate(models.Model):
 
 
 class Attendance(models.Model):
-    date = models.DateField()
     status = models.BooleanField(default=None, null=True)
     enrollmentId = models.ForeignKey('EventEnrollment', on_delete=models.CASCADE)
-    eventId = models.ForeignKey('Event', on_delete=models.CASCADE)
+    eventDateId = models.ForeignKey('EventDate', on_delete=models.CASCADE)
 
 class Certificate(models.Model):
     file = models.FileField(upload_to =os.sep.join(['certificate', '']))
@@ -123,7 +122,7 @@ class ComplementaryActivity(models.Model):
     description = models.CharField(max_length=500)
     feedback = models.TextField(max_length=500)
     ActivityTypeId = models.ForeignKey('ActivityType', on_delete=models.CASCADE)
-    tudentId = models.ForeignKey('Student', on_delete=models.CASCADE)
-    certificateId = models.ForeignKey('Certificate', on_delete=models.CASCADE)
+    studentId = models.ForeignKey('Student', on_delete=models.CASCADE)
+    certificateId = models.ForeignKey('Certificate', on_delete=models.CASCADE, unique=True)
 
 
