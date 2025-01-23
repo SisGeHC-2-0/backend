@@ -1,13 +1,18 @@
 from rest_framework import serializers
 
 
-from .models import Major, ActivityType
+from .models import *
 
 class MajorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Major
         fields = ["id", "name"]
 
+class ComplementaryActivitySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ComplementaryActivity
+        fields = ["id", "workload", "status", "description", "feedback", "ActivityTypeId_id", "certificateId_id", "studentId_id"]
 
 class ActivityTypeSerializer(serializers.ModelSerializer):
     class Meta:
