@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework import generics
-from .models import Major, ActivityType
-from .serializers import MajorSerializer, ActivityTypeSerializer
+from .models import Major, ActivityType, ComplementaryActivity
+from .serializers import MajorSerializer, ActivityTypeSerializer, SubmitComplementaryActivitySerializer
 
 
 # Create your views here.
@@ -26,3 +26,7 @@ class ActivityTypeRetreiveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ActivityTypeSerializer
     lookup_field = "pk"
 
+
+class SubmitComplementaryActivityCreate(generics.CreateAPIView):
+    queryset = ComplementaryActivity.objects.all()
+    serializer_class = SubmitComplementaryActivitySerializer

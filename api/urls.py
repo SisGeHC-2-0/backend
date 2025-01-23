@@ -8,4 +8,8 @@ urlpatterns = [
 
     path("activity_type/", views.ActivityTypeListCreate.as_view(), name="ActivityType-view-create"),
     path("activity_type/<int:pk>/", views.ActivityTypeRetreiveUpdateDestroy.as_view(), name="ActivityType-view-retreive-update-delete"),
+
+    path("complementary_activity/", views.SubmitComplementaryActivityCreate.as_view(), name="SubmitComplementaryActivity-create"),
+
+
 ]
