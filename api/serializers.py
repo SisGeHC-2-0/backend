@@ -18,3 +18,13 @@ class ActivityTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = ActivityType
         fields = ["id", "name", "total_max", "per_submission_max"]
+
+class StudentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Student
+        fields = ["id", "email", "enrollment_number", "status", "name", "majorId_id"]
+
+class MajorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Major
+        fields = ["id", "name"]

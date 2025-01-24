@@ -1,6 +1,6 @@
 import psycopg2, git
 
-connection = psycopg2.connect(database="postgres", user="postgres", password="admin", host="127.0.0.1", port=5432)
+connection = psycopg2.connect(database="postgres", user="postgres", password="example", host="127.0.0.1", port=5432)
 
 cursor = connection.cursor()
 
@@ -72,8 +72,9 @@ sql_statements = [
 for statement in sql_statements:
     cursor.execute(statement)
 
-cursor.commit()
-
+cursor.close()
+connection.commit()
+connection.close()
 """
 print("Downloading files")
 
