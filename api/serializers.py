@@ -23,8 +23,3 @@ class StudentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Student
         fields = ["id", "email", "enrollment_number", "status", "name", "majorId_id"]
-
-class MajorSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Major
-        fields = ["id", "name"]
