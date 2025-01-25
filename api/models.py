@@ -27,7 +27,7 @@ class Principal(models.Model):
 
     name = models.CharField(max_length=255)
     password = models.CharField(max_length=255)
-    majorId = models.ForeignKey('Major', on_delete=models.CASCADE)
+    majorId = models.ForeignKey(Major, on_delete=models.CASCADE)
     picture = models.ImageField(upload_to= os.sep.join(['files', 'images','principal', '']), null=True, blank=True, default=None)
     def __str__(self):
         return f"Principal {self.name}"
@@ -60,7 +60,7 @@ class Student(models.Model):
     enrollment_number = models.CharField(max_length=255, unique=True)
 
 
-    majorId = models.ForeignKey('Major', on_delete=models.CASCADE)  # Chave estrangeira para Curso
+    majorId = models.ForeignKey(Major, on_delete=models.CASCADE)  # Chave estrangeira para Curso
     picture = models.ImageField(upload_to=os.sep.join(['files', 'images','student', '']), null=True, blank=True, default=None)
 
     def __str__(self):
@@ -73,8 +73,8 @@ class Event(models.Model):
     desc_detailed = models.CharField(max_length= 511)
     enroll_date_begin = models.DateField()
     enroll_date_end = models.DateField()
-    professorId = models.ForeignKey('Professor', on_delete=models.CASCADE)
-    ActivityTypeId = models.ForeignKey("ActivityType", on_delete=models.CASCADE)
+    professorId = models.ForeignKey(Professor, on_delete=models.CASCADE)
+    ActivityTypeId = models.ForeignKey(ActivityType, on_delete=models.CASCADE)
     picture = models.ImageField(upload_to=os.sep.join(['files','images','event', '']), null=True, blank=True, default=None)
 
     workload = models.IntegerField(null= False)
@@ -89,26 +89,26 @@ class Event(models.Model):
             return f'Event {self.name}'
 
 class EventEnrollment(models.Model):
-    studentId = models.ForeignKey('Student', on_delete=models.CASCADE)
-    eventId = models.ForeignKey('Event', on_delete=models.CASCADE)
+    studentId = models.ForeignKey(Student, on_delete=models.CASCADE)
+    eventId = models.ForeignKey(Event, on_delete=models.CASCADE)
 
 class EventDate(models.Model):
     date = models.DateField()
     time_begin = models.TimeField()
     time_end = models.TimeField()
-    eventId = models.ForeignKey('Event', on_delete=models.CASCADE)
+    eventId = models.ForeignKey(Event, on_delete=models.CASCADE)
 
 
 class Attendance(models.Model):
     status = models.BooleanField(default=None, null=True)
-    enrollmentId = models.ForeignKey('EventEnrollment', on_delete=models.CASCADE)
-    eventDateId = models.ForeignKey('EventDate', on_delete=models.CASCADE)
+    enrollmentId = models.ForeignKey(EventEnrollment, on_delete=models.CASCADE)
+    eventDateId = models.ForeignKey(EventDate, on_delete=models.CASCADE)
 
 
 class Certificate(models.Model):
     file = models.FileField(upload_to =os.sep.join(['files','certificates', '']))
-    studentId = models.ForeignKey('Student', on_delete=models.CASCADE)
-    eventId = models.ForeignKey('Event', on_delete=models.CASCADE, null=True)
+    studentId = models.ForeignKey(Student, on_delete=models.CASCADE)
+    eventId = models.ForeignKey(Event, on_delete=models.CASCADE, null=True)
     
     # Null is true in case it isnt a certificate that we generate
     emission_date = models.DateTimeField(null=True)
@@ -122,8 +122,8 @@ class ComplementaryActivity(models.Model):
     status = models.BooleanField(null=True, default=None)
     description = models.CharField(max_length=500)
     feedback = models.TextField(max_length=500)
-    ActivityTypeId = models.ForeignKey('ActivityType', on_delete=models.CASCADE)
-    studentId = models.ForeignKey('Student', on_delete=models.CASCADE)
-    certificateId = models.ForeignKey('Certificate', on_delete=models.CASCADE, unique=True)
+    ActivityTypeId = models.ForeignKey(ActivityType, on_delete=models.CASCADE)
+    studentId = models.ForeignKey(Student, on_delete=models.CASCADE)
+    certificateId = models.ForeignKey(Certificate, on_delete=models.CASCADE, unique=True)
 
 
