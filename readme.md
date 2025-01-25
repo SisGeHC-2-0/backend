@@ -57,7 +57,7 @@ If you also want to populate the db with some dummy data, you can just run the p
 
 
 ```
-    python populate_db.py
+    python manage.py runscript populate_db
 ```
 
 Eventually a setup script is going to be made.
