@@ -86,7 +86,7 @@ class Event(models.Model):
     is_online = models.BooleanField(default=False)
     ended = models.BooleanField(default=False, null= False) 
     def __str__(self):
-            return self.nome
+            return f'Event {self.name}'
 
 class EventEnrollment(models.Model):
     studentId = models.ForeignKey(Student, on_delete=models.CASCADE)
@@ -103,6 +103,7 @@ class Attendance(models.Model):
     status = models.BooleanField(default=None, null=True)
     enrollmentId = models.ForeignKey(EventEnrollment, on_delete=models.CASCADE)
     eventDateId = models.ForeignKey(EventDate, on_delete=models.CASCADE)
+
 
 class Certificate(models.Model):
     file = models.FileField(upload_to =os.sep.join(['files','certificates', '']))

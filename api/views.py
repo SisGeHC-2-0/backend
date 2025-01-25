@@ -61,3 +61,7 @@ class ActivityTypeRetreiveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ActivityTypeSerializer
     lookup_field = "pk"
 
+
+class SubmitComplementaryActivityCreate(generics.CreateAPIView):
+    queryset = ComplementaryActivity.objects.all()
+    serializer_class = SubmitComplementaryActivitySerializer
