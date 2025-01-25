@@ -16,24 +16,24 @@ class MajorRetreiveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = MajorSerializer
     lookup_field = "pk"
 
-class ComplementaryActivitySerializerAluno(generics.ListCreateAPIView):
+class ComplementaryActivitySerializerStudent(generics.ListCreateAPIView):
     serializer_class = ComplementaryActivitySerializer
     def get_queryset(self):
         return ComplementaryActivity.objects.filter(studentId=self.kwargs['studentId_id'])
 
-class ComplementaryActivitySerializerAlunoName(generics.ListCreateAPIView):
+class ComplementaryActivitySerializerStudentName(generics.ListCreateAPIView):
     serializer_class = ComplementaryActivitySerializer
     def get_queryset(self):
         name = self.kwargs['name']
         return ComplementaryActivity.objects.filter(studentId__name__icontains=name)
 
 
-class ComplementaryActivitySerializerAlunoTipo(generics.ListCreateAPIView):
+class ComplementaryActivitySerializerStudentType(generics.ListCreateAPIView):
     serializer_class = ComplementaryActivitySerializer
     def get_queryset(self):
         return ComplementaryActivity.objects.filter(studentId=self.kwargs['studentId_id'], ActivityTypeId=self.kwargs['ActivityTypeId_id'])
 
-class ComplementaryActivitySerializerCurso(generics.ListCreateAPIView):
+class ComplementaryActivitySerializerMajor(generics.ListCreateAPIView):
     serializer_class = ComplementaryActivitySerializer
 
     def get_queryset(self):
@@ -42,7 +42,7 @@ class ComplementaryActivitySerializerCurso(generics.ListCreateAPIView):
             studentId__majorId=course_id
         )
 
-class ComplementaryActivitySerializerCursoTipo(generics.ListCreateAPIView):
+class ComplementaryActivitySerializerMajorType(generics.ListCreateAPIView):
     serializer_class = ComplementaryActivitySerializer
 
     def get_queryset(self):
