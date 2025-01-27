@@ -18,5 +18,11 @@ urlpatterns = [
 
     path("complementary_activity/", views.SubmitComplementaryActivityCreate.as_view(), name="SubmitComplementaryActivity-create"),
 
+    path("certificate/<int:pk>/", view=views.CertificateRetrieve.as_view(), name="Certificate-Retrieve"),
+    path("certificate/<int:event_id>/<int:student_id>", views.CertificateRetrieveByEventAndStudent.as_view(), name="Certificate-Retrievr-By-Event-Student"),
+    
+    
+    path("files/certificates/<str:cer_name>", views.retrieve_certificate, name="slugma"),
+    path("files/images/<str:entitty_name>/<str:pic_name>", views.retrieve_img, name="slugma")
 
 ]

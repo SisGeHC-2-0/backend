@@ -2,10 +2,9 @@ from django.shortcuts import render
 from rest_framework import generics
 from .models import *
 from .serializers import *
-
-
+from django.http import HttpRequest, FileResponse, HttpResponseNotFound, JsonResponse
+from django.http import Http404 
 # Create your views here.
-
 
 class MajorListCreate(generics.ListCreateAPIView):
     queryset = Major.objects.all()
@@ -65,3 +64,44 @@ class ActivityTypeRetreiveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
 class SubmitComplementaryActivityCreate(generics.CreateAPIView):
     queryset = ComplementaryActivity.objects.all()
     serializer_class = SubmitComplementaryActivitySerializer
+
+
+
+class CertificateRetrieve(generics.RetrieveAPIView):
+    queryset = Certificate.objects.all()
+    serializer_class = CertificateSerializer
+
+class CertificateRetrieveByEventAndStudent(generics.RetrieveAPIView):
+    serializer_class = CertificateSerializer
+    def get_object(self):
+        event_id = self.kwargs['event_id']  
+        student_id = self.kwargs['student_id']
+
+        try:
+            return ComplementaryActivity.objects.get(
+                                                    studentId_id = student_id, 
+                                                    certificateId__eventId_id = event_id
+                                                    ).certificateId
+        except Exception as e:
+            raise Http404("Couldnt find the certificate associeted with these values")
+
+
+
+# File retrievers
+
+def retrieve_img(request : HttpRequest,entitty_name , pic_name: str):
+    path = os.sep.join(['files', 'images', entitty_name, pic_name])
+    
+    if not os.path.exists( path):
+        return HttpResponseNotFound(f"File {entitty_name}, {pic_name} doesnt exist")
+
+    return FileResponse(open(path, 'rb'))
+
+
+def retrieve_certificate(request : HttpRequest, cer_name: str):
+    path = os.sep.join(['files', 'certificates', cer_name])
+    
+    if not os.path.exists( path):
+        return HttpResponseNotFound(f"certificate {cer_name} doesnt exist")
+
+    return FileResponse(open(path, 'rb'))
