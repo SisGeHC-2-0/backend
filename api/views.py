@@ -65,7 +65,26 @@ class SubmitComplementaryActivityCreate(generics.CreateAPIView):
     queryset = ComplementaryActivity.objects.all()
     serializer_class = SubmitComplementaryActivitySerializer
 
+class StudentListCreate(generics.ListCreateAPIView):
+    queryset = Student.objects.all()
+    serializer_class = StudentSerializer
 
+class StudentRetreiveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Student.objects.all()
+    serializer_class = StudentSerializer
+    lookup_field = "pk"
+
+class EventListCreate(generics.ListCreateAPIView):
+    queryset = Event.objects.all()
+    serializer_class = EventSerializer
+
+    # def get(self, request, *args, **kwargs):
+    #     return self.retrieve(request, *args, **kwargs)
+
+class EventRetreiveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Event.objects.all()
+    serializer_class = EventSerializer
+    lookup_field = "pk"
 
 class CertificateRetrieve(generics.RetrieveAPIView):
     queryset = Certificate.objects.all()
