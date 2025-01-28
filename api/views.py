@@ -56,7 +56,6 @@ class ComplementaryActivitySerializerMajorType(generics.ListAPIView):
 
 class ComplementaryActivitySerializerEditApprovedRecuseFeedbak(generics.UpdateAPIView):
     serializer_class = EditApprovedRecuseFeedbackComplementaryActivitySerializer
-    # O Django Rest Framework irá automaticamente buscar o objeto com o 'pk' (id) da URL
     def get_object(self):
         try:
             pk = self.kwargs['ComplementaryActivity_id']
