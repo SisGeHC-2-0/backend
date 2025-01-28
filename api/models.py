@@ -121,7 +121,7 @@ class ComplementaryActivity(models.Model):
     workload = models.IntegerField()
     status = models.BooleanField(null=True, default=None)
     description = models.CharField(max_length=500)
-    feedback = models.TextField(max_length=500)
+    feedback = models.TextField(max_length=500, null=True, blank=True)
     ActivityTypeId = models.ForeignKey(ActivityType, on_delete=models.CASCADE)
     studentId = models.ForeignKey(Student, on_delete=models.CASCADE)
     certificateId = models.ForeignKey(Certificate, on_delete=models.CASCADE, unique=True)

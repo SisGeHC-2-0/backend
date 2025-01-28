@@ -15,6 +15,11 @@ class ComplementaryActivitySerializer(serializers.ModelSerializer):
         model = ComplementaryActivity
         fields = ["id", "workload", "status", "description", "feedback", "ActivityTypeId_id", "certificateId_id", "studentId_id"]
 
+class EditApprovedRecuseFeedbackComplementaryActivitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ComplementaryActivity
+        fields = ["id", "status", "feedback"]
+
 class ActivityTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = ActivityType
