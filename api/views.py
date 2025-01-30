@@ -1,9 +1,13 @@
+from urllib import request
+
 from django.shortcuts import render
 from rest_framework import generics
 from .models import *
 from .serializers import *
 from django.http import HttpRequest, FileResponse, HttpResponseNotFound, JsonResponse
-from django.http import Http404 
+from django.http import Http404
+from rest_framework.response import Response
+from rest_framework import status
 # Create your views here.
 
 class MajorListCreate(generics.ListCreateAPIView):
@@ -49,6 +53,26 @@ class ComplementaryActivitySerializerMajorType(generics.ListAPIView):
         return ComplementaryActivity.objects.filter(
             studentId__majorId=course_id, ActivityTypeId=self.kwargs['ActivityTypeId_id']
         )
+
+class ComplementaryActivitySerializerEditApprovedRecuseFeedbak(generics.UpdateAPIView):
+    serializer_class = EditApprovedRecuseFeedbackComplementaryActivitySerializer
+    def get_object(self):
+        try:
+            pk = self.kwargs['ComplementaryActivity_id']
+            return ComplementaryActivity.objects.get(pk=pk)
+        except ComplementaryActivity.DoesNotExist:
+            raise Http404("Couldn't find the complementary activity associated with these values")
+
+    def update(self, request, *args, **kwargs):
+        activity = self.get_object()
+
+        serializer = self.get_serializer(activity, data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ActivityTypeListCreate(generics.ListCreateAPIView):
