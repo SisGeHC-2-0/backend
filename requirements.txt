@@ -5,3 +5,7 @@ psycopg2-binary
 Pillow
 GitPython
 django-extensions
+setuptools
+pyyaml
+inflection
+
