@@ -59,6 +59,11 @@ def run():
 	VALUES (20, null, 'a course of handpainting ive made', '', 2, 1, 1),
 		(20, null, 'a course of handpainting ive made', '', 2, 2, 2);
 	""",
+	"""
+        INSERT INTO api_complementaryactivity (workload, status, description, feedback, "ActivityTypeId_id", "certificateId_id", "studentId_id")
+        VALUES (20, 1, 'a course of handpainting ive made', '', 2, 1, 1),
+            (20, 1, 'a course of handpainting ive made', '', 2, 2, 2);
+    """,
 	]
 
 	for insert in inserts:
