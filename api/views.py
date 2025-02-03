@@ -78,8 +78,12 @@ class EventListCreate(generics.ListCreateAPIView):
     queryset = Event.objects.all()
     serializer_class = EventSerializer
 
-    # def get(self, request, *args, **kwargs):
-    #     return self.retrieve(request, *args, **kwargs)
+    def get_serializer_class(self):
+        # Verifica se o parâmetro 'fields' está presente na requisição e é igual a 'short'
+        if self.request.query_params.get('fields') == 'short':
+            return EventShortSerializer
+        # Caso contrário, retorna o serializer completo
+        return EventSerializer
 
 class EventRetreiveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     queryset = Event.objects.all()

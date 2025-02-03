@@ -62,3 +62,8 @@ class EventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
         fields = ["id", "name", "desc_short", "desc_detailed", "enroll_date_begin", "enroll_date_end", "workload", "minimum_attendances", "maximum_enrollments", "address", "is_online", "ended", "ActivityTypeId_id", "professorId_id"]
+
+class EventShortSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Event
+        fields = ["id", "name", "desc_short"]
