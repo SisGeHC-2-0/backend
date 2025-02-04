@@ -40,9 +40,11 @@ INSTALLED_APPS = [
     "api",
     "rest_framework",    
     'django_extensions',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -71,7 +73,12 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'proj.wsgi.application'
-
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+]
+SECURE_BROWSER_XSS_FILTER = False
+X_FRAME_OPTIONS = 'ALLOWALL'
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
