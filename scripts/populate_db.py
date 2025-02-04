@@ -1,6 +1,3 @@
-import os
-os.environ["GIT_PYTHON_REFRESH"] = "quiet"
-
 from git import Repo  # pip install gitpython
 
 from django.db import connection
@@ -61,19 +58,19 @@ def run():
 	INSERT INTO api_complementaryactivity (workload, status, description, feedback, "ActivityTypeId_id", "certificateId_id", "studentId_id")
 	VALUES (20, null, 'a course of handpainting ive made', '', 2, 1, 1),
 		(20, null, 'a course of handpainting ive made', '', 2, 2, 2);
+	""",
 	"""
+        INSERT INTO api_complementaryactivity (workload, status, description, feedback, "ActivityTypeId_id", "certificateId_id", "studentId_id")
+        VALUES (20, 1, 'a course of handpainting ive made', '', 2, 1, 1),
+            (20, 1, 'a course of handpainting ive made', '', 2, 2, 2);
+    """,
 	]
 
 	for insert in inserts:
 		with connection.cursor() as cursor:
-			try:
-				cursor.execute(insert)
-			except Exception as e:
-				pass
-	try:
-		Repo.clone_from("https://github.com/SisGeHC-2-0/backend.git", "./files",     branch='dummy_files')
+			cursor.execute(insert)
 
+	try:
+		Repo.clone_from("git@github.com:SisGeHC-2-0/backend.git", "./files",     branch='dummy_files')
 	except Exception as e:
 		print("Couldn't download the files automatically. \nPlease refer to the branch 'dummy_files' and put both the images and certificates foldes in a new 'files' folder at the root of the project")
-
-print("\n\n\nRefer to localhost:8000/docs to see all the application routes \n\n")
