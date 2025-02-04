@@ -9,3 +9,6 @@ setuptools
 pyyaml
 inflection
 
+
+uritemplate
+
