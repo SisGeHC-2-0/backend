@@ -12,7 +12,7 @@ urlpatterns = [
     path("complementary_activity/major/<int:majorId_id>/", views.ComplementaryActivitySerializerMajor.as_view(), name = "ComplementaryActivity-view-major"),
     path("complementary_activity/major/<int:majorId_id>/type/<int:ActivityTypeId_id>/", views.ComplementaryActivitySerializerMajorType.as_view(), name = "ComplementaryActivity-view-major-type"),
     path("complementary_activity/<int:ComplementaryActivity_id>/", views.ComplementaryActivitySerializerEditApprovedRecuseFeedbak.as_view(), name = "ComplementaryActivity-view-edit-approved-recuse-feedback"),
-
+    path("complementary_activity/coordenador/<int:majorId_id>/", views.ComplementaryActivitySerializerCoordenadorMajor.as_view(), name = "ComplementaryActivity-view-coordenador-approved-or-recuse"),
 
     path("activity_type/", views.ActivityTypeListCreate.as_view(), name="ActivityType-view-create"),
     path("activity_type/<int:pk>/", views.ActivityTypeRetreiveUpdateDestroy.as_view(), name="ActivityType-view-retreive-update-delete"),
