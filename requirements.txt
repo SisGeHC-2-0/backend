@@ -8,7 +8,7 @@ django-extensions
 setuptools
 pyyaml
 inflection
-
+django-cors-headers
 
 uritemplate
 
