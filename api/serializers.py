@@ -64,7 +64,7 @@ class SubmitComplementaryActivitySerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
 
-        ComplementaryActivity.objects.all().delete()
+        # ComplementaryActivity.objects.all().delete()
 
         certificate_data = validated_data.pop('certificateId')
 
