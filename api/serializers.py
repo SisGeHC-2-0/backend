@@ -15,6 +15,13 @@ class ComplementaryActivitySerializer(serializers.ModelSerializer):
         model = ComplementaryActivity
         fields = ["id", "workload", "status", "description", "feedback", "ActivityTypeId_id", "certificateId_id", "studentId_id"]
 
+class ComplementaryActivitySerializerStudent(serializers.ModelSerializer):
+    activity_name = serializers.CharField(source='ActivityTypeId.name', read_only=True)
+    certificate_date = serializers.FileField(source='certificateId.emission_date', read_only=True)
+    class Meta:
+        model = ComplementaryActivity
+        fields = ["id", "workload", "status", "description", "feedback", "activity_name", "certificate_date", "studentId_id"]
+
 class ComplementaryActivitySerializerCoordenador(serializers.ModelSerializer):
     # Campos personalizados
     activity_name = serializers.CharField(source='ActivityTypeId.name', read_only=True)
