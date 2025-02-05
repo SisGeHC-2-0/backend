@@ -25,9 +25,9 @@ class ComplementaryActivitySerializerStudent(generics.ListAPIView):
         return ComplementaryActivity.objects.filter(studentId=self.kwargs['studentId_id'])
 
 class ComplementaryActivitySerializerStudentName(generics.ListAPIView):
-    serializer_class = ComplementaryActivitySerializerStudent
+    serializer_class = ComplementaryActivitySerializerStudentName
     def get_queryset(self):
-        name = self.kwargs['name']
+        name = self.kwargs.get('name')  # Usa .get() para evitar erro se não existir
         return ComplementaryActivity.objects.filter(studentId__name__icontains=name)
 
 
