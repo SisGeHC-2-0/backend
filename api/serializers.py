@@ -23,7 +23,7 @@ class ComplementaryActivitySerializerCoordenador(serializers.ModelSerializer):
 
     class Meta:
         model = ComplementaryActivity
-        fields = ['workload', 'description', 'activity_name', 'student_name', 'certificate_file']
+        fields = ['id', 'workload', 'description', 'activity_name', 'student_name', 'certificate_file']
 
     def to_representation(self, instance):
         # Retorna os dados personalizados
