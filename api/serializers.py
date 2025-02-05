@@ -15,6 +15,22 @@ class ComplementaryActivitySerializer(serializers.ModelSerializer):
         model = ComplementaryActivity
         fields = ["id", "workload", "status", "description", "feedback", "ActivityTypeId_id", "certificateId_id", "studentId_id"]
 
+class ComplementaryActivitySerializerCoordenador(serializers.ModelSerializer):
+    # Campos personalizados
+    activity_name = serializers.CharField(source='ActivityTypeId.name', read_only=True)
+    student_name = serializers.CharField(source='studentId.name', read_only=True)
+    certificate_file = serializers.FileField(source='certificateId.file', read_only=True)
+
+    class Meta:
+        model = ComplementaryActivity
+        fields = ['workload', 'description', 'activity_name', 'student_name', 'certificate_file']
+
+    def to_representation(self, instance):
+        # Retorna os dados personalizados
+        representation = super().to_representation(instance)
+
+        return representation
+
 class EditApprovedRecuseFeedbackComplementaryActivitySerializer(serializers.ModelSerializer):
     class Meta:
         model = ComplementaryActivity

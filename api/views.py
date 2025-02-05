@@ -46,7 +46,7 @@ class ComplementaryActivitySerializerMajor(generics.ListAPIView):
         )
 
 class ComplementaryActivitySerializerCoordenadorMajor(generics.ListAPIView):
-    serializer_class = ComplementaryActivitySerializer
+    serializer_class = ComplementaryActivitySerializerCoordenador
 
     def get_queryset(self):
         course_id = self.kwargs['majorId_id']
