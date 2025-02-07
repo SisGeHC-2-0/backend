@@ -8,7 +8,37 @@ cursor = connection.cursor()
 sql_statements = [
     """
     INSERT INTO api_activitytype (name, total_max, per_submission_max) 
-    VALUES ('Research', 120, 30), ('Extension', 120, 30);
+    VALUES ('Cursos de língua estrangeira – mínimo três semestres', 60, 60), 
+    ('Cursos de complementação de conteúdos das disciplinas do curso – mínimo 50 % da carga horária do curso', 60, 60),
+    ('Cursos de formação geral: política, sociedade, ética profissional – mínimo 50 % da carga horária do curso', 60, 60),
+    ('Apresentação de trabalhos na Semana Universitária – oral ou painel', 48, 8),
+    ('Apresentação de trabalhos em congressos, simpósios, encontros nacionais – oral ou painel', 48, 8),
+    ('Prêmio acadêmico, artístico ou cultural', 60, 15),
+    ('Trabalhos completos publicados em anais', 80, 20),
+    ('Publicação de livros de divulgação científica com ISBN', 80, 20),
+    ('Publicação de capítulo de livros com ISBN', 50, 10),
+    ('Publicação de livros na área de conhecimento do Curso – autor único ou com até 3 (três) autores', 60, 15),
+    ('Publicação de Resumos em Congressos Científicos locais', 20, 2),
+    ('Publicação de Resumos em Congressos Científicos regionais', 30, 3),
+    ('Publicação de Resumos em Congressos Científicos nacionais', 40, 4),
+    ('Publicação de Resumos em Congressos Científicos internacionais', 40, 5),
+    ('Publicação de Artigos em revistas locais com corpo editorial', 50, 10),
+    ('Publicação de Artigos em revistas nacionais com corpo editorial', 60, 15),
+    ('Publicação de Artigos em revistas internacionais com corpo editorial', 80, 20),
+    ('Publicação de Artigos de divulgação científica, tecnológica e artística em revista especializada', 20, 5),
+    ('Publicação de Artigos de divulgação científica, tecnológica e artística em jornais', 20, 5),
+    ('Participação em eventos: congressos, semanas, encontros, oficinas, palestras, conferências, mesas-redondas, seminários, simpósios, desde que observe o que preceitua o Art. 2º da Resolução Nº 3241', 40, 2),
+    ('Participação em comissões organizadoras de eventos acadêmicos, artísticos e culturais com duração mínima de 20 horas', 40, 10),
+    ('Catalogação de documentos em Instituições parceiras aprovadas pelo colegiado do curso', 20, 20),
+    ('Produção de material didático com orientação de Coordenadores da UECE', 40, 8),
+    ('Participação em campanhas de saúde pública: vacinação, prevenção de epidemias', 20, 5),
+    ('Participação em campanhas e atividades de educação ambiental', 20, 5),
+    ('Produção de filmes, vídeos ou audiovisuais de informação científicos e culturais', 20, 5),
+    ('Direção de peça, vídeo e audiovisual de produção artística', 20, 5),
+    ('Mostras de artes plásticas', 20, 5),
+    ('Composição musical', 20, 5),
+    ('Participação em grupo artístico da UECE', 15, 3),
+    ('Curso de informática – mínimo 50 % da carga horária do curso', 60, 60);
     """,
     """
     INSERT INTO api_major (name) 

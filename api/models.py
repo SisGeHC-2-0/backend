@@ -11,7 +11,7 @@ class Major(models.Model):
         return f"Major: {self.name}"
     
 class ActivityType(models.Model):
-    name = models.CharField(max_length=100, null=False)
+    name = models.CharField(max_length=200, null=False)
     total_max = models.IntegerField(null=False)
     per_submission_max = models.IntegerField(null=False)
 
