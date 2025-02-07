@@ -75,19 +75,8 @@ class StudentRetreiveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     lookup_field = "pk"
 
 class EventListCreate(generics.ListCreateAPIView):
-    # queryset = Event.objects.all()
-    queryset = Event.objects.select_related(
-        "professorId__majorId"
-    )
+    queryset = Event.objects.all()
     serializer_class = EventSerializer
-    print(queryset)
-
-    def get_serializer_class(self):
-        # Verifica se o parâmetro 'fields' está presente na requisição e é igual a 'short'
-        if self.request.query_params.get('fields') == 'short':
-            return EventShortSerializer
-        # Caso contrário, retorna o serializer completo
-        return EventSerializer
 
 class EventRetreiveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     queryset = Event.objects.all()
