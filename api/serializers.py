@@ -59,14 +59,22 @@ class EditApprovedRecuseFeedbackComplementaryActivitySerializer(serializers.Mode
 
         return data
 
-
     def update(self, instance :ComplementaryActivity, validated_data):
         if validated_data['status']:
 
-            all_valid_activities_of_type = ComplementaryActivity.objects.filter(status=True, ActivityTypeId=instance.ActivityTypeId)
+            all_valid_activities_of_type = ComplementaryActivity.objects.filter(
+                                                                                status=True, 
+                                                                                ActivityTypeId=instance.ActivityTypeId, 
+                                                                                studentId=instance.studentId
+                                                                               )
+            
             accumulated_workload = all_valid_activities_of_type.aggregate(Sum('workload'))["workload__sum"] or 0
 
-            validated_data['workload'] = min(instance.ActivityTypeId.total_max - accumulated_workload, instance.workload)
+            validated_data['workload'] = min(
+                                             instance.ActivityTypeId.total_max - accumulated_workload, 
+                                             instance.workload, 
+                                             instance.ActivityTypeId.per_submission_max
+                                            )
 
         return super().update(instance, validated_data)
 
@@ -98,17 +106,11 @@ class SubmitComplementaryActivitySerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
 
-        # ComplementaryActivity.objects.all().delete()
-
         certificate_data = validated_data.pop('certificateId')
 
         cerr = Certificate.objects.create(**certificate_data)
 
-        activity = ComplementaryActivity(**validated_data, status=None, feedback='',certificateId=cerr, studentId=cerr.studentId)
-        activity_type = activity.ActivityTypeId
-
-        activity.workload = min(activity.workload, activity_type.per_submission_max)
-               
+        activity = ComplementaryActivity(**validated_data, status=None, feedback='',certificateId=cerr, studentId=cerr.studentId)               
         activity.save()
 
         return activity                                     
