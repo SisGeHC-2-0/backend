@@ -1,6 +1,7 @@
 from django.db.models import Sum
 from rest_framework import serializers
 from .validators import non_negative_int
+from rest_framework.validators import ValidationError
 
 from .models import *
 
@@ -49,6 +50,25 @@ class EditApprovedRecuseFeedbackComplementaryActivitySerializer(serializers.Mode
     class Meta:
         model = ComplementaryActivity
         fields = ["id", "status", "feedback"]
+
+    def validate(self, data):
+        if self.instance.status is not None:
+            raise ValidationError("Can only edit Complementary Activities with status null")
+        if data['status'] is None:
+            raise ValidationError("Cant change Complementary Activities status to null")
+
+        return data
+
+
+    def update(self, instance :ComplementaryActivity, validated_data):
+        if validated_data['status']:
+
+            all_valid_activities_of_type = ComplementaryActivity.objects.filter(status=True, ActivityTypeId=instance.ActivityTypeId)
+            accumulated_workload = all_valid_activities_of_type.aggregate(Sum('workload'))["workload__sum"] or 0
+
+            validated_data['workload'] = min(instance.ActivityTypeId.total_max - accumulated_workload, instance.workload)
+
+        return super().update(instance, validated_data)
 
 class ActivityTypeSerializer(serializers.ModelSerializer):
     class Meta:
