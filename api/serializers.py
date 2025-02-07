@@ -1,6 +1,7 @@
 from django.db.models import Sum
 from rest_framework import serializers
 from .validators import non_negative_int
+from rest_framework.validators import ValidationError
 
 from .models import *
 
@@ -14,6 +15,60 @@ class ComplementaryActivitySerializer(serializers.ModelSerializer):
     class Meta:
         model = ComplementaryActivity
         fields = ["id", "workload", "status", "description", "feedback", "ActivityTypeId_id", "certificateId_id", "studentId_id"]
+
+class ComplementaryActivitySerializerStudent(serializers.ModelSerializer):
+    activity_name = serializers.CharField(source='ActivityTypeId.name', read_only=True)
+    certificate_date = serializers.DateTimeField(source='certificateId.emission_date', read_only=True)
+    class Meta:
+        model = ComplementaryActivity
+        fields = ["id", "workload", "status", "description", "feedback", "activity_name", "certificate_date", "studentId_id"]
+
+class ComplementaryActivitySerializerStudentName(serializers.ModelSerializer):
+    activity_name = serializers.CharField(source='ActivityTypeId.name', read_only=True)
+    certificate_date = serializers.DateTimeField(source='certificateId.emission_date', read_only=True)
+    class Meta:
+        model = ComplementaryActivity
+        fields = ["id", "workload", "status", "description", "feedback", "activity_name", "certificate_date", "studentId_id"]
+
+class ComplementaryActivitySerializerCoordenador(serializers.ModelSerializer):
+    # Campos personalizados
+    activity_name = serializers.CharField(source='ActivityTypeId.name', read_only=True)
+    student_name = serializers.CharField(source='studentId.name', read_only=True)
+    certificate_file = serializers.FileField(source='certificateId.file', read_only=True)
+
+    class Meta:
+        model = ComplementaryActivity
+        fields = ['id', 'workload', 'description', 'activity_name', 'student_name', 'certificate_file']
+
+    def to_representation(self, instance):
+        # Retorna os dados personalizados
+        representation = super().to_representation(instance)
+
+        return representation
+
+class EditApprovedRecuseFeedbackComplementaryActivitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ComplementaryActivity
+        fields = ["id", "status", "feedback"]
+
+    def validate(self, data):
+        if self.instance.status is not None:
+            raise ValidationError("Can only edit Complementary Activities with status null")
+        if data['status'] is None:
+            raise ValidationError("Cant change Complementary Activities status to null")
+
+        return data
+
+
+    def update(self, instance :ComplementaryActivity, validated_data):
+        if validated_data['status']:
+
+            all_valid_activities_of_type = ComplementaryActivity.objects.filter(status=True, ActivityTypeId=instance.ActivityTypeId)
+            accumulated_workload = all_valid_activities_of_type.aggregate(Sum('workload'))["workload__sum"] or 0
+
+            validated_data['workload'] = min(instance.ActivityTypeId.total_max - accumulated_workload, instance.workload)
+
+        return super().update(instance, validated_data)
 
 class ActivityTypeSerializer(serializers.ModelSerializer):
     class Meta:
@@ -43,7 +98,7 @@ class SubmitComplementaryActivitySerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
 
-        ComplementaryActivity.objects.all().delete()
+        # ComplementaryActivity.objects.all().delete()
 
         certificate_data = validated_data.pop('certificateId')
 

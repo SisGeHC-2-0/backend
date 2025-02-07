@@ -1,9 +1,13 @@
+from urllib import request
+
 from django.shortcuts import render
 from rest_framework import generics
 from .models import *
 from .serializers import *
 from django.http import HttpRequest, FileResponse, HttpResponseNotFound, JsonResponse
-from django.http import Http404 
+from django.http import Http404
+from rest_framework.response import Response
+from rest_framework import status
 # Create your views here.
 
 class MajorListCreate(generics.ListCreateAPIView):
@@ -16,19 +20,19 @@ class MajorRetreiveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     lookup_field = "pk"
 
 class ComplementaryActivitySerializerStudent(generics.ListAPIView):
-    serializer_class = ComplementaryActivitySerializer
+    serializer_class = ComplementaryActivitySerializerStudent
     def get_queryset(self):
         return ComplementaryActivity.objects.filter(studentId=self.kwargs['studentId_id'])
 
 class ComplementaryActivitySerializerStudentName(generics.ListAPIView):
-    serializer_class = ComplementaryActivitySerializer
+    serializer_class = ComplementaryActivitySerializerStudentName
     def get_queryset(self):
-        name = self.kwargs['name']
+        name = self.kwargs.get('name')  # Usa .get() para evitar erro se não existir
         return ComplementaryActivity.objects.filter(studentId__name__icontains=name)
 
 
 class ComplementaryActivitySerializerStudentType(generics.ListAPIView):
-    serializer_class = ComplementaryActivitySerializer
+    serializer_class = ComplementaryActivitySerializerStudent
     def get_queryset(self):
         return ComplementaryActivity.objects.filter(studentId=self.kwargs['studentId_id'], ActivityTypeId=self.kwargs['ActivityTypeId_id'])
 
@@ -41,6 +45,24 @@ class ComplementaryActivitySerializerMajor(generics.ListAPIView):
             studentId__majorId=course_id
         )
 
+class ComplementaryActivitySerializerCoordenadorMajor(generics.ListAPIView):
+    serializer_class = ComplementaryActivitySerializerCoordenador
+
+    def get_queryset(self):
+        course_id = self.kwargs['majorId_id']
+        return ComplementaryActivity.objects.filter(
+            studentId__majorId=course_id, status=None
+        )
+
+class ComplementaryActivitySerializerCoordenadorMajorApproved(generics.ListAPIView):
+    serializer_class = ComplementaryActivitySerializerCoordenador
+
+    def get_queryset(self):
+        course_id = self.kwargs['majorId_id']
+        return ComplementaryActivity.objects.filter(
+            studentId__majorId=course_id, status=True
+        )
+
 class ComplementaryActivitySerializerMajorType(generics.ListAPIView):
     serializer_class = ComplementaryActivitySerializer
 
@@ -49,6 +71,26 @@ class ComplementaryActivitySerializerMajorType(generics.ListAPIView):
         return ComplementaryActivity.objects.filter(
             studentId__majorId=course_id, ActivityTypeId=self.kwargs['ActivityTypeId_id']
         )
+
+class ComplementaryActivitySerializerEditApprovedRecuseFeedbak(generics.UpdateAPIView):
+    serializer_class = EditApprovedRecuseFeedbackComplementaryActivitySerializer
+    def get_object(self):
+        try:
+            pk = self.kwargs['ComplementaryActivity_id']
+            return ComplementaryActivity.objects.get(pk=pk)
+        except ComplementaryActivity.DoesNotExist:
+            raise Http404("Couldn't find the complementary activity associated with these values")
+
+    def update(self, request, *args, **kwargs):
+        activity = self.get_object()
+
+        serializer = self.get_serializer(activity, data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ActivityTypeListCreate(generics.ListCreateAPIView):

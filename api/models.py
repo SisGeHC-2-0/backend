@@ -11,7 +11,7 @@ class Major(models.Model):
         return f"Major: {self.name}"
     
 class ActivityType(models.Model):
-    name = models.CharField(max_length=100, null=False)
+    name = models.CharField(max_length=200, null=False)
     total_max = models.IntegerField(null=False)
     per_submission_max = models.IntegerField(null=False)
 
@@ -121,7 +121,7 @@ class ComplementaryActivity(models.Model):
     workload = models.IntegerField()
     status = models.BooleanField(null=True, default=None)
     description = models.CharField(max_length=500)
-    feedback = models.TextField(max_length=500)
+    feedback = models.TextField(max_length=500, null=True, blank=True)
     ActivityTypeId = models.ForeignKey(ActivityType, on_delete=models.CASCADE)
     studentId = models.ForeignKey(Student, on_delete=models.CASCADE)
     certificateId = models.ForeignKey(Certificate, on_delete=models.CASCADE, unique=True)
