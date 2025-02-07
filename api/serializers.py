@@ -78,7 +78,7 @@ class ActivityTypeSerializer(serializers.ModelSerializer):
 class StudentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Student
-        fields = ["id", "email", "enrollment_number", "status", "name", "majorId_id"]
+        fields = ["id", "name", "password", "email", "enrollment_number", "majorId_id"]
         
         
 class CertificateSerializer(serializers.ModelSerializer):
@@ -112,4 +112,17 @@ class SubmitComplementaryActivitySerializer(serializers.ModelSerializer):
         activity.save()
 
         return activity                                     
-                                                    
+
+class ProfessorSerializer(serializers.ModelSerializer):
+    major = MajorSerializer(source="majorId")
+
+    class Meta:
+        model = Professor
+        fields = ["id", "name", "email", "enrollment_number", "major"]
+
+class EventSerializer(serializers.ModelSerializer):
+    professor = ProfessorSerializer(source="professorId")
+    
+    class Meta:
+        model = Event
+        fields = ["id", "name", "desc_short", "desc_detailed", "enroll_date_begin", "enroll_date_end", "picture", "workload", "minimum_attendances", "maximum_enrollments", "address", "is_online", "ended", "ActivityTypeId_id", "professor"]

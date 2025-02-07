@@ -15,6 +15,13 @@ urlpatterns = [
     path("complementary_activity/coordenador/<int:majorId_id>/", views.ComplementaryActivitySerializerCoordenadorMajor.as_view(), name = "ComplementaryActivity-view-coordenador-approved-or-recuse"),
     path("complementary_activity/coordenador/approved/<int:majorId_id>/", views.ComplementaryActivitySerializerCoordenadorMajorApproved.as_view(), name = "ComplementaryActivity-view-coordenador-approved"),
 
+    path("event/", views.EventListCreate.as_view(), name="Event-view-create"),
+    path("event/<int:pk>/", views.EventRetreiveUpdateDestroy.as_view(), name="Event-view-retreive-update-delete"),
+    path("event/<str:name>/", views.EventRetreiveUpdateDestroy.as_view(), name="Event-view-retreive-update-delete"),
+
+    path("student/", views.StudentListCreate.as_view(), name="Student-view-create"),
+    path("student/<int:pk>/", views.StudentRetreiveUpdateDestroy.as_view(), name="Student-view-retreive-update-delete"),
+
     path("activity_type/", views.ActivityTypeListCreate.as_view(), name="ActivityType-view-create"),
     path("activity_type/<int:pk>/", views.ActivityTypeRetreiveUpdateDestroy.as_view(), name="ActivityType-view-retreive-update-delete"),
 
