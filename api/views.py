@@ -120,6 +120,13 @@ class EventListCreate(generics.ListCreateAPIView):
     queryset = Event.objects.all()
     serializer_class = EventSerializer
 
+    def list(self, request, *args, **kwargs):
+        major_name = request.GET.get("major_name", None)
+        if major_name is not None:
+            print(f'Filter: {major_name}')
+            self.queryset = Event.objects.filter(professorId__majorId__name__icontains=major_name)
+        return super().list(request, *args, **kwargs)
+
 class EventRetreiveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     queryset = Event.objects.all()
     serializer_class = EventSerializer

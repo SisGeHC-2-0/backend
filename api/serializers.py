@@ -121,8 +121,29 @@ class ProfessorSerializer(serializers.ModelSerializer):
         fields = ["id", "name", "email", "enrollment_number", "major"]
 
 class EventSerializer(serializers.ModelSerializer):
-    professor = ProfessorSerializer(source="professorId")
+    # professor = ProfessorSerializer(source="professorId", read_only=True)
+    professorId = serializers.PrimaryKeyRelatedField(queryset=Professor.objects.all(), write_only=True)
     
     class Meta:
         model = Event
-        fields = ["id", "name", "desc_short", "desc_detailed", "enroll_date_begin", "enroll_date_end", "picture", "workload", "minimum_attendances", "maximum_enrollments", "address", "is_online", "ended", "ActivityTypeId_id", "professor"]
+        fields = ["id", "name", "desc_short", "desc_detailed", "enroll_date_begin", "enroll_date_end", "picture", "workload", "minimum_attendances", "maximum_enrollments", "address", "is_online", "ended", "ActivityTypeId","professorId"]
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        
+        # Adicionando detalhes do professor ao campo professorId
+        professor = instance.professorId
+        representation['professorId'] = {
+            "id": professor.id,
+            "name": professor.name,
+            "email": professor.email,
+            "enrollment_number": professor.enrollment_number,
+            "major": {
+                "id": professor.majorId.id,
+                "name": professor.majorId.name
+            }
+        }
+        return representation
+
+    def create(self, validated_data):
+        return Event.objects.create(**validated_data)
