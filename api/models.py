@@ -144,6 +144,6 @@ class Attendance(models.Model):
                                 # status=None 
                                 ).all() 
             
-        print(attendance, target_day, target_hour)
+        # print(attendance, target_day, target_hour)
         
         return attendance[0] if len(attendance) != 0 else None
