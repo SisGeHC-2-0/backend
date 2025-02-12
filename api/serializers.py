@@ -113,7 +113,7 @@ class SubmitComplementaryActivitySerializer(serializers.ModelSerializer):
         activity = ComplementaryActivity(**validated_data, status=None, feedback='',certificateId=cerr, studentId=cerr.studentId)               
         activity.save()
 
-        return activity                                     
+        return activity
 
 class ProfessorSerializer(serializers.ModelSerializer):
     major = MajorSerializer(source="majorId")
@@ -123,8 +123,18 @@ class ProfessorSerializer(serializers.ModelSerializer):
         fields = ["id", "name", "email", "enrollment_number", "major"]
 
 class EventSerializer(serializers.ModelSerializer):
-    professor = ProfessorSerializer(source="professorId")
-    
+    professor = ProfessorSerializer(source="professorId", read_only=True)  # No GET, retorna detalhes do professor
+    professorId = serializers.PrimaryKeyRelatedField(
+        queryset=Professor.objects.all(), write_only=True
+    )  # No POST/PUT, aceita apenas o ID
+
     class Meta:
         model = Event
-        fields = ["id", "name", "desc_short", "desc_detailed", "enroll_date_begin", "enroll_date_end", "picture", "workload", "minimum_attendances", "maximum_enrollments", "address", "is_online", "ended", "ActivityTypeId_id", "professor"]
+        fields = [
+            "id", "name", "desc_short", "desc_detailed", "enroll_date_begin", "enroll_date_end",
+            "picture", "workload", "minimum_attendances", "maximum_enrollments", "address",
+            "is_online", "ended", "ActivityTypeId_id", "professor", "professorId"
+        ]
+
+    def create(self, validated_data):
+        return Event.objects.create(**validated_data)
