@@ -122,19 +122,34 @@ class ProfessorSerializer(serializers.ModelSerializer):
         model = Professor
         fields = ["id", "name", "email", "enrollment_number", "major"]
 
+class EventDateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EventDate
+        fields = ["date", "time_begin", "time_end"]
+
 class EventSerializer(serializers.ModelSerializer):
-    professor = ProfessorSerializer(source="professorId", read_only=True)  # No GET, retorna detalhes do professor
+    professor_name = serializers.CharField(source="professorId.name", read_only=True)
+    major_name = serializers.CharField(source="professorId.majorId.name", read_only=True)
     professorId = serializers.PrimaryKeyRelatedField(
         queryset=Professor.objects.all(), write_only=True
     )  # No POST/PUT, aceita apenas o ID
+    event_dates = EventDateSerializer(many=True, write_only=True)  # Para receber a lista de datas
 
     class Meta:
         model = Event
         fields = [
             "id", "name", "desc_short", "desc_detailed", "enroll_date_begin", "enroll_date_end",
             "picture", "workload", "minimum_attendances", "maximum_enrollments", "address",
-            "is_online", "ended", "ActivityTypeId", "professor", "professorId"
+            "is_online", "ended", "ActivityTypeId", "professor_name", "major_name", "professorId", "event_dates"
         ]
 
     def create(self, validated_data):
-        return Event.objects.create(**validated_data)
+        event_dates_data = validated_data.pop("event_dates")  # Extrai os dias do evento
+        event = Event.objects.create(**validated_data)  # Cria o evento
+
+        # Criar as datas associadas ao evento
+        for date_data in event_dates_data:
+            EventDate.objects.create(eventId=event, **date_data)
+
+        return event
+
