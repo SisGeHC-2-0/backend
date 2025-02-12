@@ -120,13 +120,19 @@ class ProfessorSerializer(serializers.ModelSerializer):
         model = Professor
         fields = ["id", "name", "email", "enrollment_number", "major"]
 
+class EventDateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EventDate
+        fields = ["date", "time_begin", "time_end"]
+
 class EventSerializer(serializers.ModelSerializer):
     # professor = ProfessorSerializer(source="professorId", read_only=True)
     professorId = serializers.PrimaryKeyRelatedField(queryset=Professor.objects.all(), write_only=True)
+    event_dates = EventDateSerializer(many=True, write_only=True)  # Para receber a lista de datas
     
     class Meta:
         model = Event
-        fields = ["id", "name", "desc_short", "desc_detailed", "enroll_date_begin", "enroll_date_end", "picture", "workload", "minimum_attendances", "maximum_enrollments", "address", "is_online", "ended", "ActivityTypeId","professorId"]
+        fields = ["id", "name", "desc_short", "desc_detailed", "enroll_date_begin", "enroll_date_end", "picture", "workload", "minimum_attendances", "maximum_enrollments", "address", "is_online", "ended", "ActivityTypeId", "professorId", "event_dates"]
 
     def to_representation(self, instance):
         representation = super().to_representation(instance)
@@ -146,4 +152,11 @@ class EventSerializer(serializers.ModelSerializer):
         return representation
 
     def create(self, validated_data):
-        return Event.objects.create(**validated_data)
+        event_dates_data = validated_data.pop("event_dates")
+
+        event = Event.objects.create(**validated_data)
+
+        for date in event_dates_data:
+            EventDate.objects.create(eventId=event, **date) 
+
+        return event
