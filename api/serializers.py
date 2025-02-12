@@ -128,7 +128,7 @@ class EventDateSerializer(serializers.ModelSerializer):
 class EventSerializer(serializers.ModelSerializer):
     # professor = ProfessorSerializer(source="professorId", read_only=True)
     professorId = serializers.PrimaryKeyRelatedField(queryset=Professor.objects.all(), write_only=True)
-    event_dates = EventDateSerializer(many=True, write_only=True)  # Para receber a lista de datas
+    event_dates = EventDateSerializer(many=True)  # Para receber a lista de datas
     
     class Meta:
         model = Event

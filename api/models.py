@@ -96,7 +96,7 @@ class EventDate(models.Model):
     date = models.DateField()
     time_begin = models.TimeField()
     time_end = models.TimeField()
-    eventId = models.ForeignKey(Event, on_delete=models.CASCADE)
+    eventId = models.ForeignKey(Event, related_name='event_dates', on_delete=models.CASCADE)
 
 
 class Attendance(models.Model):
