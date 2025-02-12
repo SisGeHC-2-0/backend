@@ -141,7 +141,7 @@ class Attendance(models.Model):
                                 eventDateId__date=target_day,
                                 eventDateId__time_begin__lte=(target_hour + time_tolerance).time(),
                                 eventDateId__time_end__gte=(target_hour - time_tolerance).time(),
-                                # status=None 
+                                status=None 
                                 ).all() 
             
         # print(attendance, target_day, target_hour)
