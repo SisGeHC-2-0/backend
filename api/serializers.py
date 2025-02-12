@@ -133,7 +133,7 @@ class EventSerializer(serializers.ModelSerializer):
         fields = [
             "id", "name", "desc_short", "desc_detailed", "enroll_date_begin", "enroll_date_end",
             "picture", "workload", "minimum_attendances", "maximum_enrollments", "address",
-            "is_online", "ended", "ActivityTypeId_id", "professor", "professorId"
+            "is_online", "ended", "ActivityTypeId", "professor", "professorId"
         ]
 
     def create(self, validated_data):
