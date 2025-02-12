@@ -18,9 +18,12 @@ urlpatterns = [
     path("event/", views.EventListCreate.as_view(), name="Event-view-create"),
     path("event/<int:pk>/", views.EventRetreiveUpdateDestroy.as_view(), name="Event-view-retreive-update-delete"),
     path("event/<str:name>/", views.EventRetreiveUpdateDestroy.as_view(), name="Event-view-retreive-update-delete"),
+    path("event/student/event-enroll/", views.EventEnrollmentListCreate.as_view(), name='Event-view-submit'),
+    path('event/<int:event_id>/enrollments/', views.EventEnrollmentList.as_view(), name='event-enrollments'),
 
     path("student/", views.StudentListCreate.as_view(), name="Student-view-create"),
     path("student/<int:pk>/", views.StudentRetreiveUpdateDestroy.as_view(), name="Student-view-retreive-update-delete"),
+    path('student/<int:student_id>/enrollments/', views.StudentEventEnrollmentList.as_view(), name='student-enrollments'),
 
     path("activity_type/", views.ActivityTypeListCreate.as_view(), name="ActivityType-view-create"),
     path("activity_type/<int:pk>/", views.ActivityTypeRetreiveUpdateDestroy.as_view(), name="ActivityType-view-retreive-update-delete"),

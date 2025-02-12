@@ -2,6 +2,7 @@ from django.db.models import Sum
 from rest_framework import serializers
 from .validators import non_negative_int
 from rest_framework.validators import ValidationError
+from django.utils import timezone
 
 from .models import *
 
@@ -160,3 +161,31 @@ class EventSerializer(serializers.ModelSerializer):
             EventDate.objects.create(eventId=event, **date) 
 
         return event
+
+class EventEnrollmentSerializer(serializers.ModelSerializer):
+    event = EventSerializer
+    class Meta:
+        model = EventEnrollment
+        fields = ["studentId", "eventId"]
+
+    def validate(self, data):
+        # Verifica se o estudante já está inscrito no evento
+        student = data["studentId"]
+        event = data["eventId"]
+        
+        if EventEnrollment.objects.filter(studentId=student, eventId=event).exists():
+            raise serializers.ValidationError("O estudante já está inscrito neste evento.")
+        
+        # Verifica se o evento ainda está dentro do período de inscrição
+        if event.enroll_date_begin > timezone.now().date() or event.enroll_date_end < timezone.now().date():
+            raise serializers.ValidationError("Fora do período de inscrição para este evento.")
+        
+        # Verifica se o evento ainda tem vagas disponíveis
+        current_enrollments = EventEnrollment.objects.filter(eventId=event).count()
+        if current_enrollments >= event.maximum_enrollments:
+            raise serializers.ValidationError("O evento atingiu o número máximo de inscrições.")
+        
+        return data
+
+    def create(self, validated_data):
+        return EventEnrollment.objects.create(**validated_data)

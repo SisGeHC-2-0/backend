@@ -132,6 +132,24 @@ class EventRetreiveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = EventSerializer
     lookup_field = "pk"
 
+class EventEnrollmentListCreate(generics.ListCreateAPIView):
+    queryset = EventEnrollment.objects.all()
+    serializer_class = EventEnrollmentSerializer
+
+class StudentEventEnrollmentList(generics.ListAPIView):
+    serializer_class = EventEnrollmentSerializer
+
+    def get_queryset(self):
+        student_id = self.kwargs['student_id']
+        return EventEnrollment.objects.filter(studentId=student_id)
+    
+class EventEnrollmentList(generics.ListAPIView):
+    serializer_class = EventEnrollmentSerializer
+
+    def get_queryset(self):
+        event_id = self.kwargs['event_id']
+        return EventEnrollment.objects.filter(eventId=event_id)    
+
 class CertificateRetrieve(generics.RetrieveAPIView):
     queryset = Certificate.objects.all()
     serializer_class = CertificateSerializer
