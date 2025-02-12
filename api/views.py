@@ -1,7 +1,5 @@
-from urllib import request
 
-from django.shortcuts import render
-import io, qrcode, datetime, json
+import datetime
 from rest_framework import generics
 from .models import *
 from .serializers import *
@@ -9,6 +7,7 @@ from django.http import HttpRequest, FileResponse, HttpResponseNotFound, HttpRes
 from django.http import Http404, HttpResponseNotFound
 from rest_framework.response import Response
 from rest_framework import status
+from .qr_code_utils import to_qr_code_byte_stream
 # Create your views here.
 
 class MajorListCreate(generics.ListCreateAPIView):
@@ -144,41 +143,14 @@ class CertificateRetrieveByEventAndStudent(generics.RetrieveAPIView):
         except Exception as e:
             raise Http404("Couldnt find the certificate associeted with these values")
 
-
-def get_attendance_of(
-                      event_id : int, 
-                      student_id : int, 
-                      time_tolerance: datetime.timedelta = datetime.timedelta(minutes=30), 
-                      target_day : datetime.date = datetime.date.today(),
-                      target_hour : datetime = datetime.datetime.now()  
-                     ) -> Attendance | None:
-
-    attendance = Attendance.objects.filter(
-                              enrollmentId__studentId__id = student_id, 
-                              eventDateId__eventId__id = event_id,
-                              eventDateId__date=target_day,
-                              eventDateId__time_begin__gte=(target_hour + time_tolerance).time(),
-                              eventDateId__time_end__lte=(target_hour - time_tolerance).time() 
-                             ).all() 
-        
-    return attendance[0] if len(attendance) != 0 else None
-
-
-def to_qr_code_byte_stream(data):
-    data = json.dumps(data)
-
-    img_byte_arr = io.BytesIO()
-    qrcode.make(data).save(img_byte_arr, format='PNG')
-    img_byte_arr.seek(0)
-
-    return img_byte_arr
-
 def gen_qr_code(request : HttpRequest, event_id : int, student_id):
-
     if request.method != "GET":
         return HttpResponseNotAllowed(("GET"), f"{request.method} method not allowed")
 
-    att = get_attendance_of(event_id, student_id)
+    att = Attendance.get_from_event_student(event_id, student_id
+        # ,target_day= datetime.datetime.strptime("2025-02-21", "%Y-%m-%d").date(),  
+        #  target_hour= datetime.datetime.strptime("11:29", "%H:%M")
+    )
 
     if att is None:
         return HttpResponseNotFound(f"Cant find attandance to event: {event_id} and student {student_id}")
