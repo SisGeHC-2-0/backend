@@ -128,3 +128,9 @@ class EventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
         fields = ["id", "name", "desc_short", "desc_detailed", "enroll_date_begin", "enroll_date_end", "picture", "workload", "minimum_attendances", "maximum_enrollments", "address", "is_online", "ended", "ActivityTypeId_id", "professor"]
+
+
+class QrCodeInfoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Attendance
+        fields = ['id']
