@@ -122,9 +122,43 @@ class ProfessorSerializer(serializers.ModelSerializer):
         model = Professor
         fields = ["id", "name", "email", "enrollment_number", "major"]
 
+class EventDateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EventDate
+        fields = ["date", "time_begin", "time_end"]
+
 class EventSerializer(serializers.ModelSerializer):
-    professor = ProfessorSerializer(source="professorId")
+    # professor = ProfessorSerializer(source="professorId", read_only=True)
+    professorId = serializers.PrimaryKeyRelatedField(queryset=Professor.objects.all(), write_only=True)
+    event_dates = EventDateSerializer(many=True)  # Para receber a lista de datas
     
     class Meta:
         model = Event
-        fields = ["id", "name", "desc_short", "desc_detailed", "enroll_date_begin", "enroll_date_end", "picture", "workload", "minimum_attendances", "maximum_enrollments", "address", "is_online", "ended", "ActivityTypeId_id", "professor"]
+        fields = ["id", "name", "desc_short", "desc_detailed", "enroll_date_begin", "enroll_date_end", "picture", "workload", "minimum_attendances", "maximum_enrollments", "address", "is_online", "ended", "ActivityTypeId", "professorId", "event_dates"]
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        
+        # Adicionando detalhes do professor ao campo professorId
+        professor = instance.professorId
+        representation['professorId'] = {
+            "id": professor.id,
+            "name": professor.name,
+            "email": professor.email,
+            "enrollment_number": professor.enrollment_number,
+            "major": {
+                "id": professor.majorId.id,
+                "name": professor.majorId.name
+            }
+        }
+        return representation
+
+    def create(self, validated_data):
+        event_dates_data = validated_data.pop("event_dates")
+
+        event = Event.objects.create(**validated_data)
+
+        for date in event_dates_data:
+            EventDate.objects.create(eventId=event, **date) 
+
+        return event
