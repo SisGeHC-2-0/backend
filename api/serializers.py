@@ -139,6 +139,15 @@ class EventSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         
+        path_begin = str(instance._meta.get_field('picture').upload_to) 
+        path_end = instance.picture.url
+
+        full_path = '/' + path_begin.replace(os.sep, '/') + path_end[1:]
+
+        req = self.context["request"]
+
+        representation['picture'] = req.build_absolute_uri(full_path)
+
         # Adicionando detalhes do professor ao campo professorId
         professor = instance.professorId
         representation['professorId'] = {
