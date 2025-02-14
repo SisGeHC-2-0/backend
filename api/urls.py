@@ -18,6 +18,7 @@ urlpatterns = [
     path("event/", views.EventListCreate.as_view(), name="Event-view-create"),
     path("event/<int:pk>/", views.EventRetreiveUpdateDestroy.as_view(), name="Event-view-retreive-update-delete"),
     path("event/<str:name>/", views.EventRetreiveUpdateDestroy.as_view(), name="Event-view-retreive-update-delete"),
+    path("event_date/", views.EventDateCreate.as_view(), name="Create-Event-Dates"),
 
     path("student/", views.StudentListCreate.as_view(), name="Student-view-create"),
     path("student/<int:pk>/", views.StudentRetreiveUpdateDestroy.as_view(), name="Student-view-retreive-update-delete"),
