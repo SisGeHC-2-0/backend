@@ -130,7 +130,7 @@ class EventDateSerializer(serializers.ModelSerializer):
 class EventSerializer(serializers.ModelSerializer):
     # professor = ProfessorSerializer(source="professorId", read_only=True)
     professorId = serializers.PrimaryKeyRelatedField(queryset=Professor.objects.all(), write_only=True)
-    event_dates = EventDateSerializer(many=True)  # Para receber a lista de datas
+    event_dates = EventDateSerializer(many=True, read_only=True)  # Para receber a lista de datas
     
     class Meta:
         model = Event
@@ -154,11 +154,29 @@ class EventSerializer(serializers.ModelSerializer):
         return representation
 
     def create(self, validated_data):
-        event_dates_data = validated_data.pop("event_dates")
 
         event = Event.objects.create(**validated_data)
 
-        for date in event_dates_data:
-            EventDate.objects.create(eventId=event, **date) 
-
         return event
+
+class EventDateCreateSerializer(serializers.ModelSerializer):
+    eventId = serializers.PrimaryKeyRelatedField(queryset=Event.objects.all())
+
+    class Meta:
+        model = EventDate
+        fields = ["id", "eventId", "time_begin", "time_end", "date"]
+
+    def create(self, validated_data):
+        dates_data = validated_data.pop('dates', None)
+
+        # Caso tenha 'dates', significa que o usuário passou uma lista
+        if dates_data:
+            event_dates = []
+            for date_data in dates_data:
+                date_data['eventId'] = validated_data['eventId']  # Herdando o evento
+                event_date = EventDate.objects.create(**date_data)
+                event_dates.append(event_date)
+            return event_dates
+
+        # Caso contrário, é a criação de apenas uma data
+        return EventDate.objects.create(**validated_data)

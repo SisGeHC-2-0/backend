@@ -127,6 +127,10 @@ class EventListCreate(generics.ListCreateAPIView):
             self.queryset = Event.objects.filter(professorId__majorId__name__icontains=major_name)
         return super().list(request, *args, **kwargs)
 
+class EventDateCreate(generics.ListCreateAPIView):
+    queryset = EventDate.objects.all()
+    serializer_class = EventDateCreateSerializer
+
 class EventRetreiveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     queryset = Event.objects.all()
     serializer_class = EventSerializer
