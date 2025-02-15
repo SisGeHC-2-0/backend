@@ -102,6 +102,8 @@ class ActivityTypeRetreiveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ActivityTypeSerializer
     lookup_field = "pk"
 
+class SubmitEnrollment(generics.CreateAPIView):
+    serializer_class = SubmitEnrollmentSerializer
 
 class SubmitComplementaryActivityCreate(generics.CreateAPIView):
     queryset = ComplementaryActivity.objects.all()
@@ -135,6 +137,13 @@ class EventRetreiveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     queryset = Event.objects.all()
     serializer_class = EventSerializer
     lookup_field = "pk"
+
+class EventRetrieveProfessor(generics.ListAPIView):
+    serializer_class = EventProfessorSerializer
+
+    def get_queryset(self):
+        professor_id = self.kwargs['professorId_id']
+        return Event.objects.filter(professorId=professor_id)
 
 class CertificateRetrieve(generics.RetrieveAPIView):
     queryset = Certificate.objects.all()
