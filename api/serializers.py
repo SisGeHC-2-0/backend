@@ -1,5 +1,7 @@
 from django.db.models import Sum
-from rest_framework import serializers
+from rest_framework import serializers, status
+from rest_framework.response import Response
+
 from .validators import non_negative_int
 from rest_framework.validators import ValidationError
 
@@ -158,6 +160,45 @@ class EventSerializer(serializers.ModelSerializer):
         event = Event.objects.create(**validated_data)
 
         return event
+
+from rest_framework import serializers
+from rest_framework.response import Response
+from rest_framework import status
+from .models import EventEnrollment, Event, EventDate, Attendance
+
+
+class SubmitEnrollmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EventEnrollment
+        fields = ["id", "studentId", "eventId"]
+
+    def create(self, validated_data):
+        event = validated_data.get("eventId")
+        student = validated_data.get("studentId")
+
+        # Check max Enrollment
+        current_enrollments = EventEnrollment.objects.filter(eventId=event).count()
+        if current_enrollments >= event.maximum_enrollments:
+            raise serializers.ValidationError({"error": "The Event is full."})
+
+        # Check if Student is enrollment
+        if EventEnrollment.objects.filter(eventId=event, studentId=student).exists():
+            raise serializers.ValidationError({"error": "Student is already enrolled in this event."})
+
+        # Create enrollment
+        enrollment = EventEnrollment.objects.create(**validated_data)
+
+        # Create Attendances
+        event_dates = EventDate.objects.filter(eventId=event)
+        for event_date in event_dates:
+            Attendance.objects.create(
+                enrollmentId=enrollment,
+                eventDateId=event_date
+            )
+
+        return enrollment
+
+
 
 class EventDateCreateSerializer(serializers.ModelSerializer):
     eventId = serializers.PrimaryKeyRelatedField(queryset=Event.objects.all())
