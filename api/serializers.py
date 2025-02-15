@@ -1,5 +1,14 @@
 from django.db.models import Sum
+from rest_framework import serializers, status
+from rest_framework.response import Response
+
 from rest_framework import serializers
+from rest_framework.response import Response
+from rest_framework import status
+from .models import EventEnrollment, Event, EventDate, Attendance
+
+
+
 from .validators import non_negative_int
 from rest_framework.validators import ValidationError
 
@@ -122,15 +131,130 @@ class ProfessorSerializer(serializers.ModelSerializer):
         model = Professor
         fields = ["id", "name", "email", "enrollment_number", "major"]
 
-class EventSerializer(serializers.ModelSerializer):
-    professor = ProfessorSerializer(source="professorId")
-    
+class EventDateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EventDate
+        fields = ["date", "time_begin", "time_end"]
+class EventProfessorSerializer(serializers.ModelSerializer):
+    current_enrollments = serializers.SerializerMethodField()
+
     class Meta:
         model = Event
-        fields = ["id", "name", "desc_short", "desc_detailed", "enroll_date_begin", "enroll_date_end", "picture", "workload", "minimum_attendances", "maximum_enrollments", "address", "is_online", "ended", "ActivityTypeId_id", "professor"]
+        fields = [
+            "id", "name", "desc_short", "desc_detailed", "enroll_date_begin", "enroll_date_end", "picture",
+            "workload", "minimum_attendances", "maximum_enrollments", "address", "is_online", "ended",
+            "ActivityTypeId", "professorId", "event_dates", "current_enrollments"
+        ]
+    def get_current_enrollments(self, obj):
+        return EventEnrollment.objects.filter(eventId=obj).count()
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
 
+        # Adicionando detalhes do professor ao campo professorId
+        professor = instance.professorId
+        representation['professorId'] = {
+            "id": professor.id,
+            "name": professor.name,
+            "email": professor.email,
+            "enrollment_number": professor.enrollment_number,
+            "major": {
+                "id": professor.majorId.id,
+                "name": professor.majorId.name
+            }
+        }
+        return representation
 
+      
 class QrCodeInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Attendance
         fields = ['id']
+      
+class EventSerializer(serializers.ModelSerializer):
+    # professor = ProfessorSerializer(source="professorId", read_only=True)
+    professorId = serializers.PrimaryKeyRelatedField(queryset=Professor.objects.all(), write_only=True)
+    event_dates = EventDateSerializer(many=True, read_only=True)  # Para receber a lista de datas
+    
+    class Meta:
+        model = Event
+
+        fields = ["id", "name", "desc_short", "desc_detailed", "enroll_date_begin", "enroll_date_end", "picture", "workload", "minimum_attendances", "maximum_enrollments", "address", "is_online", "ended", "ActivityTypeId", "professorId", "event_dates"]
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        
+        # Adicionando detalhes do professor ao campo professorId
+        professor = instance.professorId
+        representation['professorId'] = {
+            "id": professor.id,
+            "name": professor.name,
+            "email": professor.email,
+            "enrollment_number": professor.enrollment_number,
+            "major": {
+                "id": professor.majorId.id,
+                "name": professor.majorId.name
+            }
+        }
+        return representation
+
+    def create(self, validated_data):
+
+        event = Event.objects.create(**validated_data)
+
+        return event
+
+
+class SubmitEnrollmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EventEnrollment
+        fields = ["id", "studentId", "eventId"]
+
+    def create(self, validated_data):
+        event = validated_data.get("eventId")
+        student = validated_data.get("studentId")
+
+        # Check max Enrollment
+        current_enrollments = EventEnrollment.objects.filter(eventId=event).count()
+        if current_enrollments >= event.maximum_enrollments:
+            raise serializers.ValidationError({"error": "The Event is full."})
+
+        # Check if Student is enrollment
+        if EventEnrollment.objects.filter(eventId=event, studentId=student).exists():
+            raise serializers.ValidationError({"error": "Student is already enrolled in this event."})
+
+        # Create enrollment
+        enrollment = EventEnrollment.objects.create(**validated_data)
+
+        # Create Attendances
+        event_dates = EventDate.objects.filter(eventId=event)
+        for event_date in event_dates:
+            Attendance.objects.create(
+                enrollmentId=enrollment,
+                eventDateId=event_date
+            )
+
+        return enrollment
+
+
+
+class EventDateCreateSerializer(serializers.ModelSerializer):
+    eventId = serializers.PrimaryKeyRelatedField(queryset=Event.objects.all())
+
+    class Meta:
+        model = EventDate
+        fields = ["id", "eventId", "time_begin", "time_end", "date"]
+
+    def create(self, validated_data):
+        dates_data = validated_data.pop('dates', None)
+
+        # Caso tenha 'dates', significa que o usuário passou uma lista
+        if dates_data:
+            event_dates = []
+            for date_data in dates_data:
+                date_data['eventId'] = validated_data['eventId']  # Herdando o evento
+                event_date = EventDate.objects.create(**date_data)
+                event_dates.append(event_date)
+            return event_dates
+
+        # Caso contrário, é a criação de apenas uma data
+        return EventDate.objects.create(**validated_data)
