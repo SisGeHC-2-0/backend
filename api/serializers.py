@@ -2,6 +2,13 @@ from django.db.models import Sum
 from rest_framework import serializers, status
 from rest_framework.response import Response
 
+from rest_framework import serializers
+from rest_framework.response import Response
+from rest_framework import status
+from .models import EventEnrollment, Event, EventDate, Attendance
+
+
+
 from .validators import non_negative_int
 from rest_framework.validators import ValidationError
 
@@ -157,6 +164,12 @@ class EventProfessorSerializer(serializers.ModelSerializer):
         }
         return representation
 
+      
+class QrCodeInfoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Attendance
+        fields = ['id']
+      
 class EventSerializer(serializers.ModelSerializer):
     # professor = ProfessorSerializer(source="professorId", read_only=True)
     professorId = serializers.PrimaryKeyRelatedField(queryset=Professor.objects.all(), write_only=True)
@@ -164,6 +177,7 @@ class EventSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Event
+
         fields = ["id", "name", "desc_short", "desc_detailed", "enroll_date_begin", "enroll_date_end", "picture", "workload", "minimum_attendances", "maximum_enrollments", "address", "is_online", "ended", "ActivityTypeId", "professorId", "event_dates"]
 
     def to_representation(self, instance):
@@ -188,11 +202,6 @@ class EventSerializer(serializers.ModelSerializer):
         event = Event.objects.create(**validated_data)
 
         return event
-
-from rest_framework import serializers
-from rest_framework.response import Response
-from rest_framework import status
-from .models import EventEnrollment, Event, EventDate, Attendance
 
 
 class SubmitEnrollmentSerializer(serializers.ModelSerializer):

@@ -1,6 +1,6 @@
 from django.db import models
-import os
-
+import os, datetime
+from typing import Self
 # Create your models here.
 
 
@@ -98,13 +98,6 @@ class EventDate(models.Model):
     time_end = models.TimeField()
     eventId = models.ForeignKey(Event, related_name='event_dates', on_delete=models.CASCADE)
 
-
-class Attendance(models.Model):
-    status = models.BooleanField(default=None, null=True)
-    enrollmentId = models.ForeignKey(EventEnrollment, on_delete=models.CASCADE)
-    eventDateId = models.ForeignKey(EventDate, on_delete=models.CASCADE)
-
-
 class Certificate(models.Model):
     file = models.FileField(upload_to =os.sep.join(['files','certificates', '']))
     studentId = models.ForeignKey(Student, on_delete=models.CASCADE)
@@ -127,3 +120,30 @@ class ComplementaryActivity(models.Model):
     certificateId = models.ForeignKey(Certificate, on_delete=models.CASCADE, unique=True)
 
 
+class Attendance(models.Model):
+    status = models.BooleanField(default=None, null=True)
+    enrollmentId = models.ForeignKey(EventEnrollment, on_delete=models.CASCADE)
+    eventDateId = models.ForeignKey(EventDate, on_delete=models.CASCADE)
+
+    @classmethod
+    def get_from_event_student(
+                 cls,
+                 event_id : int, 
+                 student_id : int, 
+                 time_tolerance: datetime.timedelta = datetime.timedelta(minutes=30), 
+                 target_day : datetime.date = datetime.date.today(),
+                 target_hour : datetime = datetime.datetime.now()  
+                ) -> Self | None:
+
+        attendance = Attendance.objects.filter(
+                                enrollmentId__studentId__id = student_id, 
+                                eventDateId__eventId__id = event_id,
+                                eventDateId__date=target_day,
+                                eventDateId__time_begin__lte=(target_hour + time_tolerance).time(),
+                                eventDateId__time_end__gte=(target_hour - time_tolerance).time(),
+                                status=None 
+                                ).all() 
+            
+        # print(attendance, target_day, target_hour)
+        
+        return attendance[0] if len(attendance) != 0 else None

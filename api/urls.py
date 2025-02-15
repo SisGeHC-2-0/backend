@@ -35,6 +35,10 @@ urlpatterns = [
     
     
     path("files/certificates/<str:cer_name>", views.retrieve_certificate, name="slugma"),
-    path("files/images/<str:entitty_name>/<str:pic_name>", views.retrieve_img, name="slugma")
+    path("files/images/<str:entitty_name>/<str:pic_name>", views.retrieve_img, name="slugma"),
+
+    path("qr/<str:event_id>/<str:student_id>", views.get_qr_code_str, name="qr-code_text-generation"),
+    path("qr/image/<str:event_id>/<str:student_id>", views.gen_qr_code, name="qr-code_image-generation"),
+    # path("files/images/<str:entitty_name>/<str:pic_name>", views.retrieve_img, name="")
 
 ]
