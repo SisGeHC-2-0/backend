@@ -138,6 +138,13 @@ class EventRetreiveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = EventSerializer
     lookup_field = "pk"
 
+class EventRetrieveProfessor(generics.ListAPIView):
+    serializer_class = EventProfessorSerializer
+
+    def get_queryset(self):
+        professor_id = self.kwargs['professorId_id']
+        return Event.objects.filter(professorId=professor_id)
+
 class CertificateRetrieve(generics.RetrieveAPIView):
     queryset = Certificate.objects.all()
     serializer_class = CertificateSerializer
