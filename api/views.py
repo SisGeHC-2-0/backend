@@ -147,6 +147,15 @@ class EventRetrieveProfessor(generics.ListAPIView):
         professor_id = self.kwargs['professorId_id']
         return Event.objects.filter(professorId=professor_id)
 
+class EventRetrieveStudent(generics.ListAPIView):
+    serializer_class = EventStudentSerializer
+
+    def get_queryset(self):
+        student_id = self.kwargs['studentId_id']
+
+        event_ids = EventEnrollment.objects.filter(studentId=student_id).values_list('eventId', flat=True)
+
+        return Event.objects.filter(id__in=event_ids)
 class CertificateRetrieve(generics.RetrieveAPIView):
     queryset = Certificate.objects.all()
     serializer_class = CertificateSerializer
