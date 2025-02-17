@@ -19,6 +19,9 @@ urlpatterns = [
     path("event/<int:pk>/", views.EventRetreiveUpdateDestroy.as_view(), name="Event-view-retreive-update-delete"),
     path("event/<str:name>/", views.EventRetreiveUpdateDestroy.as_view(), name="Event-view-retreive-update-delete"),
     path("event_date/", views.EventDateCreate.as_view(), name="Create-Event-Dates"),
+    path("event/professor/<int:professorId_id>", views.EventRetrieveProfessor.as_view(), name="Event-view-professor"),
+    path("enrollment/event/", views.SubmitEnrollment.as_view(), name="Create-Enrollment-Event"),
+    path("event/student/<int:studentId_id>", views.EventRetrieveStudent.as_view(), name="Event-view-student"),
 
     path("student/", views.StudentListCreate.as_view(), name="Student-view-create"),
     path("student/<int:pk>/", views.StudentRetreiveUpdateDestroy.as_view(), name="Student-view-retreive-update-delete"),
@@ -33,6 +36,12 @@ urlpatterns = [
     
     
     path("files/certificates/<str:cer_name>", views.retrieve_certificate, name="slugma"),
-    path("files/images/<str:entitty_name>/<str:pic_name>", views.retrieve_img, name="slugma")
+    path("files/images/<str:entitty_name>/<str:pic_name>", views.retrieve_img, name="slugma"),
+
+    path("qr/<str:event_id>/<str:student_id>", views.get_qr_code_str, name="qr-code_text-generation"),
+    path("qr/image/<str:event_id>/<str:student_id>", views.gen_qr_code, name="qr-code_image-generation"),
+    path("attendance/<str:qr_code_str>", views.mark_attendance, name="attendance_marking"),
+    # path("ip", views.get_ip, name="qr-code_image-generation"),
+    # path("files/images/<str:entitty_name>/<str:pic_name>", views.retrieve_img, name="")
 
 ]

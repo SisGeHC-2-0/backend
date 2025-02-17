@@ -1,13 +1,14 @@
-from urllib import request
 
-from django.shortcuts import render
+import datetime
 from rest_framework import generics
 from .models import *
 from .serializers import *
-from django.http import HttpRequest, FileResponse, HttpResponseNotFound, JsonResponse
-from django.http import Http404
+from django.http import HttpRequest, FileResponse, HttpResponseNotFound, HttpResponseNotAllowed, JsonResponse
+from django.http import Http404, HttpResponseNotFound, HttpResponseBadRequest, HttpResponse
 from rest_framework.response import Response
 from rest_framework import status
+from .qr_code_utils import to_qr_code_byte_stream, to_qr_code_str, from_qr_code_string
+
 # Create your views here.
 
 class MajorListCreate(generics.ListCreateAPIView):
@@ -102,6 +103,8 @@ class ActivityTypeRetreiveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ActivityTypeSerializer
     lookup_field = "pk"
 
+class SubmitEnrollment(generics.CreateAPIView):
+    serializer_class = SubmitEnrollmentSerializer
 
 class SubmitComplementaryActivityCreate(generics.CreateAPIView):
     queryset = ComplementaryActivity.objects.all()
@@ -136,6 +139,22 @@ class EventRetreiveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = EventSerializer
     lookup_field = "pk"
 
+class EventRetrieveProfessor(generics.ListAPIView):
+    serializer_class = EventProfessorSerializer
+
+    def get_queryset(self):
+        professor_id = self.kwargs['professorId_id']
+        return Event.objects.filter(professorId=professor_id)
+
+class EventRetrieveStudent(generics.ListAPIView):
+    serializer_class = EventStudentSerializer
+
+    def get_queryset(self):
+        student_id = self.kwargs['studentId_id']
+
+        event_ids = EventEnrollment.objects.filter(studentId=student_id).values_list('eventId', flat=True)
+
+        return Event.objects.filter(id__in=event_ids)
 class CertificateRetrieve(generics.RetrieveAPIView):
     queryset = Certificate.objects.all()
     serializer_class = CertificateSerializer
@@ -154,7 +173,41 @@ class CertificateRetrieveByEventAndStudent(generics.RetrieveAPIView):
         except Exception as e:
             raise Http404("Couldnt find the certificate associeted with these values")
 
+# def qr_code_str
 
+def get_qr_code_str(request : HttpRequest, event_id : int, student_id):
+    if request.method != "GET":
+        return HttpResponseNotAllowed(("GET"), f"{request.method} method not allowed")
+
+    att = Attendance.get_from_event_student(event_id, student_id
+        # ,target_day= datetime.datetime.strptime("2025-02-21", "%Y-%m-%d").date(),  
+        #  target_hour= datetime.datetime.strptime("11:29", "%H:%M")
+    )
+
+    if att is None:
+        return HttpResponseNotFound(f"Cant find attandance to event: {event_id} and student {student_id} at the current time")
+
+
+    return JsonResponse(
+                        {
+                            "data" : to_qr_code_str(QrCodeInfoSerializer(att).data)
+                        }
+                       )
+
+def gen_qr_code(request : HttpRequest, event_id : int, student_id):
+    if request.method != "GET":
+        return HttpResponseNotAllowed(("GET"), f"{request.method} method not allowed")
+
+    att = Attendance.get_from_event_student(event_id, student_id
+        ,target_day= datetime.datetime.strptime("2025-02-21", "%Y-%m-%d").date(),  
+         target_hour= datetime.datetime.strptime("11:29", "%H:%M")
+    )
+
+    if att is None:
+        return HttpResponseNotFound(f"Cant find attandance to event: {event_id} and student {student_id} at the current time")
+
+    qr_code = to_qr_code_byte_stream(QrCodeInfoSerializer(att).data)
+    return FileResponse(qr_code, filename="qr.png")
 
 # File retrievers
 
@@ -174,3 +227,24 @@ def retrieve_certificate(request : HttpRequest, cer_name: str):
         return HttpResponseNotFound(f"certificate {cer_name} doesnt exist")
 
     return FileResponse(open(path, 'rb'))
+
+
+from django.views.decorators.csrf import csrf_exempt
+@csrf_exempt 
+def mark_attendance(request : HttpRequest, qr_code_str : str):
+    if request.method != "PUT":
+        return HttpResponseNotAllowed(("PUT"), f"{request.method} method not allowed")
+    qr_code_str = str(qr_code_str)
+
+    attendance = from_qr_code_string(qr_code_str)
+
+    if attendance is None:
+        return HttpResponseBadRequest("Invalid qr code string")
+    
+    if attendance.status is not None:
+        return HttpResponseBadRequest("Attendance already registered")
+
+
+    attendance.status = True
+    attendance.save()
+    return HttpResponse("OK!")

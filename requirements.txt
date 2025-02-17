@@ -9,6 +9,6 @@ setuptools
 pyyaml
 inflection
 django-cors-headers
-
 uritemplate
-
+qrcode
+qrcode[pil]
