@@ -1,5 +1,7 @@
 
 import datetime
+from collections import defaultdict
+
 from rest_framework import generics
 from .models import *
 from .serializers import *
@@ -156,6 +158,27 @@ class EventRetrieveStudent(generics.ListAPIView):
         event_ids = EventEnrollment.objects.filter(studentId=student_id).values_list('eventId', flat=True)
 
         return Event.objects.filter(id__in=event_ids)
+
+class EventRetrieveSeparateStudentMajor(generics.ListAPIView):
+    serializer_class = EventStudentSerializer
+
+    def list(self, request, *args, **kwargs):
+        student_id = self.kwargs['studentId_id']
+
+        # IDs dos eventos nos quais o estudante ESTÁ inscrito
+        event_ids = EventEnrollment.objects.filter(studentId_id=student_id).values_list('eventId_id', flat=True)
+
+        # Filtrar eventos que o estudante NÃO está inscrito
+        events = Event.objects.exclude(id__in=event_ids).select_related('professorId__majorId')
+
+        # Estrutura para agrupar eventos por curso (Major)
+        grouped_events = defaultdict(list)
+
+        for event in events:
+            major_name = event.professorId.majorId.name if event.professorId.majorId else "Sem Curso Definido"
+            grouped_events[major_name].append(EventStudentSerializer(event).data)
+
+        return Response(grouped_events)
 class CertificateRetrieve(generics.RetrieveAPIView):
     queryset = Certificate.objects.all()
     serializer_class = CertificateSerializer

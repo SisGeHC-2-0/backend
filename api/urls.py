@@ -22,6 +22,7 @@ urlpatterns = [
     path("event/professor/<int:professorId_id>", views.EventRetrieveProfessor.as_view(), name="Event-view-professor"),
     path("enrollment/event/", views.SubmitEnrollment.as_view(), name="Create-Enrollment-Event"),
     path("event/student/<int:studentId_id>", views.EventRetrieveStudent.as_view(), name="Event-view-student"),
+    path("event/student/<int:studentId_id>/majors", views.EventRetrieveSeparateStudentMajor.as_view(), name="Event-view-events-for-enrollment"),
 
     path("student/", views.StudentListCreate.as_view(), name="Student-view-create"),
     path("student/<int:pk>/", views.StudentRetreiveUpdateDestroy.as_view(), name="Student-view-retreive-update-delete"),
