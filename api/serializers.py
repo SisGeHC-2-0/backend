@@ -134,7 +134,7 @@ class ProfessorSerializer(serializers.ModelSerializer):
 class EventDateSerializer(serializers.ModelSerializer):
     class Meta:
         model = EventDate
-        fields = ["date", "time_begin", "time_end"]
+        fields = ["id", "date", "time_begin", "time_end"]
 class EventProfessorSerializer(serializers.ModelSerializer):
     current_enrollments = serializers.SerializerMethodField()
     event_dates = EventDateSerializer(many=True, read_only=True)
