@@ -176,7 +176,7 @@ class EventRetrieveSeparateStudentMajor(generics.ListAPIView):
 
         for event in events:
             major_name = event.professorId.majorId.name if event.professorId.majorId else "Sem Curso Definido"
-            grouped_events[major_name].append(EventStudentSerializer(event).data)
+            grouped_events[major_name].append(EventStudentSerializer(event, context={"request": request}).data)
 
         return Response(grouped_events)
 class CertificateRetrieve(generics.RetrieveAPIView):
