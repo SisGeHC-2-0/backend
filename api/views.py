@@ -223,8 +223,8 @@ def gen_qr_code(request : HttpRequest, event_id : int, student_id):
         return HttpResponseNotAllowed(("GET"), f"{request.method} method not allowed")
 
     att = Attendance.get_from_event_student(event_id, student_id
-        ,target_day= datetime.datetime.strptime("2025-02-21", "%Y-%m-%d").date(),  
-         target_hour= datetime.datetime.strptime("11:29", "%H:%M")
+        # ,target_day= datetime.datetime.strptime("2025-02-21", "%Y-%m-%d").date(),  
+        #  target_hour= datetime.datetime.strptime("11:29", "%H:%M")
     )
 
     if att is None:

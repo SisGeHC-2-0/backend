@@ -132,7 +132,7 @@ class Attendance(models.Model):
                  student_id : int, 
                  time_tolerance: datetime.timedelta = datetime.timedelta(minutes=30), 
                  target_day : datetime.date = datetime.date.today(),
-                 target_hour : datetime = datetime.datetime.now()  
+                 target_hour : datetime = datetime.datetime.now() - datetime.timedelta(hours==30) 
                 ) -> Self | None:
 
         attendance = Attendance.objects.filter(
