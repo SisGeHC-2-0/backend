@@ -41,6 +41,9 @@ urlpatterns = [
 
     path("qr/<str:event_id>/<str:student_id>", views.get_qr_code_str, name="qr-code_text-generation"),
     path("qr/image/<str:event_id>/<str:student_id>", views.gen_qr_code, name="qr-code_image-generation"),
+    path("attendance/<str:qr_code_str>", views.mark_attendance, name="attendance_marking"),
+    # path("ip", views.get_ip, name="qr-code_image-generation"),
+
     # path("files/images/<str:entitty_name>/<str:pic_name>", views.retrieve_img, name="")
 
 ]

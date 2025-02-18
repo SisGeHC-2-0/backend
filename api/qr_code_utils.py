@@ -1,18 +1,22 @@
 from .serializers import QrCodeInfoSerializer
 import json, qrcode, io
+from .models import Attendance
 
 
 
-
-def from_qr_code_string(qr_code_str : str) -> QrCodeInfoSerializer | None:
+def from_qr_code_string(qr_code_str : str) -> Attendance | None:
     ##
     # You should decryptograph the string here
     ##
+    try:
+        obj = json.loads(qr_code_str)
+        data = QrCodeInfoSerializer(data = obj)
 
-    data = QrCodeInfoSerializer(json.loads(qr_code_str))
-
-    if data.is_valid():
-        return data
+        if data.is_valid():
+            return Attendance.objects.filter(id=obj['id']).get()
+    
+    except Exception:
+        pass
     return None    
 
 def to_qr_code_str(data) -> str:

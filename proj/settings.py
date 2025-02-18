@@ -25,7 +25,11 @@ SECRET_KEY = 'django-insecure-tvx!^5lf7wf6j8kan%go6zww7b%9ndsd5ap=u5l@e58%j^3r5q
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    '0.0.0.0', 
+    'localhost', 
+    '127.0.0.1'
+    ]
 
 
 # Application definition
@@ -40,6 +44,7 @@ INSTALLED_APPS = [
     "api",
     "rest_framework",    
     'django_extensions',
+    # 'django-ipware',
     'corsheaders',
 ]
 

@@ -164,7 +164,6 @@ class EventProfessorSerializer(serializers.ModelSerializer):
             }
         }
         return representation
-
       
 class QrCodeInfoSerializer(serializers.ModelSerializer):
     class Meta:
