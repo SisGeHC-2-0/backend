@@ -143,8 +143,5 @@ class Attendance(models.Model):
                                 eventDateId__time_end__gte=(target_hour - time_tolerance).time(),
                                 status__isnull=True
                                 ).all() 
-            
-        for att in attendance:
-            print(f"the status of this is {att.status}")
         
         return attendance[0] if len(attendance) != 0 else None

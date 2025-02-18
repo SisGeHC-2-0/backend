@@ -1,5 +1,6 @@
 
 import datetime
+from collections import defaultdict
 from rest_framework import generics
 from .models import *
 from .serializers import *
@@ -8,6 +9,7 @@ from django.http import Http404, HttpResponseNotFound, HttpResponseBadRequest, H
 from rest_framework.response import Response
 from rest_framework import status
 from .qr_code_utils import to_qr_code_byte_stream, to_qr_code_str, from_qr_code_string
+from django.views.decorators.csrf import csrf_exempt
 
 # Create your views here.
 
@@ -155,6 +157,28 @@ class EventRetrieveStudent(generics.ListAPIView):
         event_ids = EventEnrollment.objects.filter(studentId=student_id).values_list('eventId', flat=True)
 
         return Event.objects.filter(id__in=event_ids)
+
+class EventRetrieveSeparateStudentMajor(generics.ListAPIView):
+    serializer_class = EventStudentSerializer
+
+    def list(self, request, *args, **kwargs):
+        student_id = self.kwargs['studentId_id']
+
+        # IDs dos eventos nos quais o estudante ESTÁ inscrito
+        event_ids = EventEnrollment.objects.filter(studentId_id=student_id).values_list('eventId_id', flat=True)
+
+        # Filtrar eventos que o estudante NÃO está inscrito
+        events = Event.objects.exclude(id__in=event_ids).select_related('professorId__majorId')
+
+        # Estrutura para agrupar eventos por curso (Major)
+        grouped_events = defaultdict(list)
+
+        for event in events:
+            major_name = event.professorId.majorId.name if event.professorId.majorId else "Sem Curso Definido"
+            grouped_events[major_name].append(EventStudentSerializer(event).data)
+
+        return Response(grouped_events)
+      
 class CertificateRetrieve(generics.RetrieveAPIView):
     queryset = Certificate.objects.all()
     serializer_class = CertificateSerializer
@@ -209,6 +233,27 @@ def gen_qr_code(request : HttpRequest, event_id : int, student_id):
     qr_code = to_qr_code_byte_stream(QrCodeInfoSerializer(att).data)
     return FileResponse(qr_code, filename="qr.png")
 
+    return JsonResponse(
+                        {
+                            "data" : to_qr_code_str(QrCodeInfoSerializer(att).data)
+                        }
+                       )
+
+def gen_qr_code(request : HttpRequest, event_id : int, student_id):
+    if request.method != "GET":
+        return HttpResponseNotAllowed(("GET"), f"{request.method} method not allowed")
+
+    att = Attendance.get_from_event_student(event_id, student_id
+        ,target_day= datetime.datetime.strptime("2025-02-21", "%Y-%m-%d").date(),  
+         target_hour= datetime.datetime.strptime("11:29", "%H:%M")
+    )
+
+    if att is None:
+        return HttpResponseNotFound(f"Cant find attandance to event: {event_id} and student {student_id} at the current time")
+
+    qr_code = to_qr_code_byte_stream(QrCodeInfoSerializer(att).data)
+    return FileResponse(qr_code, filename="qr.png")
+
 # File retrievers
 
 def retrieve_img(request : HttpRequest,entitty_name , pic_name: str):
@@ -228,8 +273,6 @@ def retrieve_certificate(request : HttpRequest, cer_name: str):
 
     return FileResponse(open(path, 'rb'))
 
-
-from django.views.decorators.csrf import csrf_exempt
 @csrf_exempt 
 def mark_attendance(request : HttpRequest, qr_code_str : str):
     if request.method != "PUT":
