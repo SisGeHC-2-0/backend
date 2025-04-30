@@ -124,6 +124,14 @@ class SubmitComplementaryActivitySerializer(serializers.ModelSerializer):
 
         return activity                                     
 
+class CreateProfessorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Professor
+        fields = ["name", "email", "enrollment_number", "password", "majorId", "picture"]
+
+    def create(self, validated_data):
+        professor = Professor.objects.create(**validated_data)
+        return professor
 class ProfessorSerializer(serializers.ModelSerializer):
     major = MajorSerializer(source="majorId")
 

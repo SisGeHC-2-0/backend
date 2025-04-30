@@ -197,6 +197,9 @@ class CertificateRetrieveByEventAndStudent(generics.RetrieveAPIView):
         except Exception as e:
             raise Http404("Couldnt find the certificate associeted with these values")
 
+class ProfessorCreate(generics.ListCreateAPIView):
+    queryset = Professor.objects.all()
+    serializer_class = CreateProfessorSerializer
 # def qr_code_str
 
 def get_qr_code_str(request : HttpRequest, event_id : int, student_id):

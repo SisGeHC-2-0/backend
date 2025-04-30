@@ -27,6 +27,8 @@ urlpatterns = [
     path("student/", views.StudentListCreate.as_view(), name="Student-view-create"),
     path("student/<int:pk>/", views.StudentRetreiveUpdateDestroy.as_view(), name="Student-view-retreive-update-delete"),
 
+    path("professor/", views.ProfessorCreate.as_view(), name="Professor-create"),
+
     path("activity_type/", views.ActivityTypeListCreate.as_view(), name="ActivityType-view-create"),
     path("activity_type/<int:pk>/", views.ActivityTypeRetreiveUpdateDestroy.as_view(), name="ActivityType-view-retreive-update-delete"),
 
