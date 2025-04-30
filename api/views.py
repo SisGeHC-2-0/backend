@@ -165,13 +165,10 @@ class EventRetrieveSeparateStudentMajor(generics.ListAPIView):
     def list(self, request, *args, **kwargs):
         student_id = self.kwargs['studentId_id']
 
-        # IDs dos eventos nos quais o estudante ESTÁ inscrito
         event_ids = EventEnrollment.objects.filter(studentId_id=student_id).values_list('eventId_id', flat=True)
 
-        # Filtrar eventos que o estudante NÃO está inscrito
         events = Event.objects.exclude(id__in=event_ids).select_related('professorId__majorId')
 
-        # Estrutura para agrupar eventos por curso (Major)
         grouped_events = defaultdict(list)
 
         for event in events:
